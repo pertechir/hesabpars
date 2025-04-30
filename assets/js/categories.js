@@ -1,4 +1,121 @@
-document.addEventListener('DOMContentLoaded', function() {
+// اضافه کردن در ابتدای فایل
+$(document).ready(function() {
+    // اطمینان از وجود jQuery
+    if (typeof jQuery === 'undefined') {
+        console.error('jQuery is not loaded');
+        return;
+    }
+
+    // اطمینان از وجود Bootstrap
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded');
+        return;
+    }
+
+    // اطمینان از وجود Select2
+    if (typeof $.fn.select2 === 'undefined') {
+        console.error('Select2 is not loaded');
+        return;
+    }
+
+    // ایجاد یک نمونه از مودال‌ها
+    const addCategoryModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+    const editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+
+    // اصلاح رویداد افزودن دسته‌بندی
+    $('.btn[data-bs-target="#addCategoryModal"]').on('click', function() {
+        addCategoryModal.show();
+    });
+
+    // اصلاح تابع editCategory
+    window.editCategory = function(id) {
+        // نمایش loading
+        Swal.fire({
+            title: 'لطفاً صبر کنید...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(`api/categories/${id}`)
+            .then(response => response.json())
+            .then(category => {
+                Swal.close();
+                
+                Object.keys(category).forEach(key => {
+                    const input = document.getElementById(`edit_${key}`);
+                    if (input) {
+                        if (input.tagName === 'SELECT' && $(input).hasClass('select2')) {
+                            $(input).val(category[key]).trigger('change');
+                        } else {
+                            input.value = category[key];
+                        }
+                    }
+                });
+                
+                editCategoryModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطا',
+                    text: 'خطا در دریافت اطلاعات دسته‌بندی'
+                });
+            });
+    };
+
+    // بهبود نمایش پیام‌های خطا
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'خطا',
+            text: message,
+            confirmButtonText: 'باشه'
+        });
+    }
+
+    // بهبود نمایش پیام‌های موفقیت
+    function showSuccess(message) {
+        Swal.fire({
+            icon: 'success',
+            title: 'موفقیت',
+            text: message,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+    }
+
+    // اصلاح رویداد submit فرم‌ها
+    $('#addCategoryForm, #editCategoryForm').on('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const url = this.id === 'addCategoryForm' ? 'api/categories' : `api/categories/${formData.get('category_id')}`;
+        
+        fetch(url, {
+            method: this.id === 'addCategoryForm' ? 'POST' : 'PUT',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                location.reload();
+            } else {
+                showError(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('خطا در ارسال اطلاعات');
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
     // تنظیمات Select2
     $('.select2').select2({
         dir: 'rtl',

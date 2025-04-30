@@ -22,7 +22,69 @@ body {
     color: var(--dark-color);
     line-height: 1.6;
 }
+/* اضافه کردن استایل‌های ضروری */
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
 
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+}
+
+.form-select, .form-control {
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem;
+}
+
+/* اصلاح استایل مودال */
+.modal-content {
+    border-radius: var(--radius);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-close {
+    margin: 0;
+}
+
+/* اصلاح استایل دکمه‌ها در کنار هم */
+.view-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap;
+}
+
+@media (max-width: 768px) {
+    .filters {
+        flex-wrap: wrap;
+    }
+    
+    .filters > * {
+        width: 100%;
+    }
+}
 /* کانتینر اصلی */
 .categories-container {
     padding: 2rem;
