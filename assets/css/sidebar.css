@@ -1,0 +1,242 @@
+@font-face {
+    font-family: 'Anjoman';
+    src: url('../fonts/anjoman/AnjomanMax-Regular.woff2') format('woff2'),
+         url('../fonts/anjoman/AnjomanMax-Regular.woff') format('woff'),
+         url('../fonts/anjoman/AnjomanMax-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Anjoman';
+    src: url('../fonts/anjoman/AnjomanMax-Medium.woff2') format('woff2'),
+         url('../fonts/anjoman/AnjomanMax-Medium.woff') format('woff'),
+         url('../fonts/anjoman/AnjomanMax-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    background: #ffffff;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-family: 'Anjoman', Tahoma, Arial;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar.collapsed {
+    width: 90px;
+}
+
+.toggle-button {
+    position: fixed;
+    right: 280px;
+    top: 20px;
+    background: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px 0 0 8px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    color: #333;
+}
+
+.toggle-button i {
+    font-size: 18px;
+    transform: rotate(180deg);
+}
+
+.sidebar.collapsed + .toggle-button {
+    right: 90px;
+}
+
+.sidebar.collapsed + .toggle-button i {
+    transform: rotate(0deg);
+}
+
+.toggle-button:hover {
+    background: #f8f9fa;
+}
+
+.user-section {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    overflow: hidden;
+    border: 2px solid #f1f1f1;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-name {
+    color: #333;
+    font-size: 1em;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.user-role {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.sidebar-menu {
+    padding: 15px 0;
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+}
+
+.menu-item {
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.menu-item:hover {
+    background: #f8f9fa;
+}
+
+.menu-item:hover i,
+.menu-item:hover .menu-title {
+    color: #2196F3;
+}
+
+.menu-item.active {
+    background: #f8f9fa;
+    color: #2196F3;
+    border-right: 3px solid #2196F3;
+}
+
+.menu-item i {
+    font-size: 1.1em;
+    width: 24px;
+    text-align: center;
+    color: #333;
+    transition: color 0.2s ease;
+}
+
+.menu-title {
+    font-size: 0.95em;
+    transition: color 0.2s ease;
+}
+
+.sidebar.collapsed .menu-title {
+    display: none;
+}
+
+.menu-arrow {
+    margin-right: auto;
+    transition: transform 0.3s ease;
+    color: #333;
+    font-size: 0.8em;
+}
+
+.menu-item.expanded .menu-arrow {
+    transform: rotate(-90deg);
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #fcfcfc;
+}
+
+.submenu.active {
+    max-height: 500px;
+}
+
+.submenu-item {
+    padding: 10px 20px 10px 52px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.submenu-item:hover {
+    background: #f8f9fa;
+    color: #2196F3;
+}
+
+.submenu-item.active {
+    color: #2196F3;
+    background: #f8f9fa;
+}
+
+.submenu-item i {
+    font-size: 0.9em;
+    width: 20px;
+    text-align: center;
+    color: #333;
+    transition: color 0.2s ease;
+}
+
+.submenu-item:hover i {
+    color: #2196F3;
+}
+
+/* Scrollbar Styling */
+.sidebar-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background: #e1e1e1;
+    border-radius: 10px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover {
+    background: #d1d1d1;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(100%);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .toggle-button {
+        right: 0;
+    }
+
+    .sidebar.collapsed + .toggle-button {
+        right: 0;
+    }
+}
