@@ -8,10 +8,25 @@ if (session_status() === PHP_SESSION_NONE) {
  * @return bool
  */
 function isAjaxRequest() {
-    return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ||
-            (!empty($_SERVER['HTTP_ACCEPT']) && 
-            strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+    // بررسی هدر X-Requested-With
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        return true;
+    }
+    
+    // بررسی Accept header
+    if (!empty($_SERVER['HTTP_ACCEPT']) && 
+        strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+        return true;
+    }
+    
+    // بررسی Content-Type header
+    if (!empty($_SERVER['CONTENT_TYPE']) && 
+        strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+        return true;
+    }
+    
+    return false;
 }
 
 

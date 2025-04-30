@@ -16,24 +16,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // اینیشیال کردن Sortable
-    const treeView = document.querySelector('.tree-view');
-    if (treeView) {
-        new Sortable(treeView, {
-            group: 'nested',
-            animation: 150,
-            fallbackOnBody: true,
-            swapThreshold: 0.65,
-            handle: '.drag-handle',
-            dragClass: 'sortable-drag',
-            ghostClass: 'sortable-ghost',
-            onEnd: function(evt) {
-                updateCategoryPosition(evt.item);
-            }
-        });
+    initializeSortable();
 
-        // امکان Drag & Drop برای زیردسته‌ها
-        document.querySelectorAll('.tree-children').forEach(el => {
-            new Sortable(el, {
+    // تنظیم event listeners
+    setupFormListeners();
+    setupSearchAndFilters();
+    setupActionButtons();
+
+    // حذف لودینگ
+    hideLoading();
+});
+    
+// اینیشیال کردن Sortable
+function initializeSortable() {
+        const treeView = document.querySelector('.tree-view');
+        if (treeView) {
+            new Sortable(treeView, {
                 group: 'nested',
                 animation: 150,
                 fallbackOnBody: true,
@@ -45,22 +43,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateCategoryPosition(evt.item);
                 }
             });
-        });
-    }
 
-    // Event Listeners برای فرم‌ها
-    setupFormListeners();
-    
-    // Event Listeners برای جستجو و فیلترها
-    setupSearchAndFilters();
-    
-    // Event Listeners برای دکمه‌های عملیات
-    setupActionButtons();
-
-    // حذف لودینگ
-    hideLoading();
-});
-
+            // امکان Drag & Drop برای زیردسته‌ها
+            document.querySelectorAll('.tree-children').forEach(el => {
+                new Sortable(el, {
+                    group: 'nested',
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    handle: '.drag-handle',
+                    dragClass: 'sortable-drag',
+                    ghostClass: 'sortable-ghost',
+                    onEnd: function(evt) {
+                        updateCategoryPosition(evt.item);
+                    }
+                });
+            });
+        }
+}
 // تنظیم Event Listeners برای فرم‌ها
 function setupFormListeners() {
     // فرم افزودن دسته‌بندی
@@ -177,19 +177,25 @@ async function handleFormSubmit(form, endpoint, action) {
             body: formData
         });
 
-        // بررسی نوع محتوای پاسخ
+        let result;
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-            // اگر پاسخ JSON نبود، متن خطا رو نمایش بدیم
             const text = await response.text();
             throw new Error(`خطای سرور: ${text}`);
+        } else {
+            result = await response.json();
+            // اگر پاسخ JSON موفق نباشد، خطا بده
+            if (!result.success) {
+                throw new Error(result.message || `خطا در ${action}`);
+            }
         }
 
-        const result = await response.json();
+        // بستن مودال و رفرش صفحه
+        $(form).closest('.modal').modal('hide');
+        form.reset();
         
-        if (!result.success) {
-            throw new Error(result.message || `خطا در ${action}`);
-        }
+        // رفرش لیست دسته‌بندی‌ها
+        await refreshCategoryList();
 
         // نمایش پیام موفقیت
         await Swal.fire({
@@ -198,13 +204,6 @@ async function handleFormSubmit(form, endpoint, action) {
             text: result.message,
             confirmButtonText: 'باشه'
         });
-
-        // بستن مودال و رفرش صفحه
-        $(form).closest('.modal').modal('hide');
-        form.reset();
-        
-        // رفرش لیست دسته‌بندی‌ها
-        await refreshCategoryList();
 
     } catch (error) {
         console.error('Error:', error);
@@ -345,6 +344,8 @@ async function deleteCategory(categoryId) {
 // بروزرسانی موقعیت دسته‌بندی
 async function updateCategoryPosition(item) {
     try {
+        showLoading();
+
         const categoryId = item.dataset.id;
         const parent = item.parentElement;
         const parentId = parent.closest('.tree-item')?.dataset.id || null;
@@ -355,6 +356,8 @@ async function updateCategoryPosition(item) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 category_id: categoryId,
@@ -366,7 +369,7 @@ async function updateCategoryPosition(item) {
         const result = await response.json();
         
         if (!result.success) {
-            throw new Error(result.message);
+            throw new Error(result.message || 'خطا در بروزرسانی موقعیت');
         }
 
         // رفرش لیست بدون نمایش لودینگ
@@ -374,8 +377,16 @@ async function updateCategoryPosition(item) {
 
     } catch (error) {
         console.error('Error:', error);
+        await Swal.fire({
+            icon: 'error',
+            title: 'خطا',
+            text: error.message,
+            confirmButtonText: 'باشه'
+        });
         // در صورت خطا، رفرش کامل صفحه
         await refreshCategoryList();
+    } finally {
+        hideLoading();
     }
 }
 
@@ -386,26 +397,34 @@ async function refreshCategoryList(showLoadingIndicator = true) {
             showLoading();
         }
 
-        const response = await fetch('ajax/get-categories.php');
+        const response = await fetch('ajax/get-categories.php', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
         const result = await response.json();
         
         if (!result.success) {
-            throw new Error(result.message);
+            throw new Error(result.message || 'خطا در بروزرسانی لیست دسته‌بندی‌ها');
         }
 
         // بروزرسانی HTML درخت
         const treeView = document.querySelector('.tree-view');
-        treeView.innerHTML = result.html;
-
-        // اینیشیال مجدد کامپوننت‌ها
-        setupActionButtons();
+        if (treeView) {
+            treeView.innerHTML = result.html;
+            initializeSortable(); // اینیشیال مجدد Sortable
+            setupActionButtons(); // اینیشیال مجدد دکمه‌های عملیات
+        }
 
     } catch (error) {
         console.error('Error:', error);
         await Swal.fire({
             icon: 'error',
             title: 'خطا',
-            text: 'خطا در بروزرسانی لیست دسته‌بندی‌ها',
+            text: error.message,
             confirmButtonText: 'باشه'
         });
     } finally {
@@ -479,9 +498,6 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-
-
-
 // مخفی کردن لودینگ
 function hideLoading() {
     const loader = document.querySelector('.loading-overlay');
@@ -489,3 +505,17 @@ function hideLoading() {
         loader.style.display = 'none';
     }
 }
+// نمایش لودینگ
+function showLoading() {
+    const loader = document.querySelector('.loading-overlay');
+    if (!loader) {
+        const newLoader = document.createElement('div');
+        newLoader.className = 'loading-overlay';
+        newLoader.innerHTML = '<div class="loading-spinner"></div>';
+        document.body.appendChild(newLoader);
+        newLoader.style.display = 'flex';
+    } else {
+        loader.style.display = 'flex';
+    }
+}
+

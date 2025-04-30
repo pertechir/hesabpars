@@ -4,23 +4,27 @@ require_once '../../includes/auth.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/jdf.php';
 
+// برای نمایش خطاها در حالت دیباگ
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+header('Content-Type: application/json; charset=utf-8');
 
 error_log("Received POST data: " . print_r($_POST, true));
 if (!empty($_FILES)) {
     error_log("Received FILES data: " . print_r($_FILES, true));
 }
 
-// برای نمایش خطاها در حالت دیباگ
-error_reporting(E_ALL);
+
 ini_set('display_errors', 0);
 
 // بررسی درخواست Ajax
 if (!isAjaxRequest()) {
     http_response_code(400);
-    exit(json_encode([
+    echo json_encode([
         'success' => false,
         'message' => 'درخواست نامعتبر'
-    ]));
+    ]);
+    exit;
 }
 
 try {
