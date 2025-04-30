@@ -171,10 +171,19 @@ async function handleFormSubmit(form, endpoint, action) {
         const response = await fetch(`ajax/${endpoint}`, {
             method: 'POST',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             },
             body: formData
         });
+
+        // بررسی نوع محتوای پاسخ
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // اگر پاسخ JSON نبود، متن خطا رو نمایش بدیم
+            const text = await response.text();
+            throw new Error(`خطای سرور: ${text}`);
+        }
 
         const result = await response.json();
         

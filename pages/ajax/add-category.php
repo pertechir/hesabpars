@@ -2,6 +2,16 @@
 require_once '../../includes/config.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/functions.php';
+// تنظیمات خطایابی
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+
+// تنظیم هدر برای JSON
+header('Content-Type: application/json; charset=utf-8');
+
+
+
+
 
 
 error_log("Received POST data: " . print_r($_POST, true));
@@ -13,8 +23,15 @@ if (!empty($_FILES)) {
 // بررسی درخواست Ajax
 if (!isAjaxRequest()) {
     http_response_code(400);
-    exit('درخواست نامعتبر');
+    echo json_encode([
+        'success' => false,
+        'message' => 'درخواست نامعتبر'
+    ]);
+    exit;
 }
+// ثبت داده‌های ورودی برای دیباگ
+error_log("Received POST data in add-category.php: " . print_r($_POST, true));
+
 
 // بررسی دسترسی
 if (!hasPermission('add_categories')) {
@@ -106,14 +123,15 @@ try {
     ]);
 
 } catch (Exception $e) {
-    if (isset($db) && $db->inTransaction()) {
-        $db->rollBack();
-    }
-    
     error_log("Error in add-category.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'debug' => [
+            'post' => $_POST,
+            'files' => $_FILES ?? []
+        ]
     ]);
 }

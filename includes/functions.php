@@ -3,9 +3,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/**
+ * بررسی درخواست Ajax
+ * @return bool
+ */
 function isAjaxRequest() {
-    return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ||
+            (!empty($_SERVER['HTTP_ACCEPT']) && 
+            strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
 }
 
 
@@ -298,15 +304,78 @@ function handleBulkAction($db) {
         return ['success' => false, 'message' => $e->getMessage()];
     }
 }
+function clean($input) {
+    if (is_array($input)) {
+        return array_map('clean', $input);
+    }
+    $input = trim($input);
+    $input = strip_tags($input);
+    $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+    return $input;
+}
 
-// تابع ایجاد slug از متن
+
+/**
+ * تولید slug از متن
+ * @param string $text متن ورودی
+ * @return string نامک تولید شده
+ */
 function createSlug($text) {
-    // تبدیل حروف فارسی/عربی به انگلیسی
-    $persian = ['ا','ب','پ','ت','ث','ج','چ','ح','خ','د','ذ','ر','ز','ژ','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ک','گ','ل','م','ن','و','ه','ی'];
-    $english = ['a','b','p','t','th','j','ch','h','kh','d','th','r','z','zh','s','sh','s','z','t','z','a','gh','f','q','k','g','l','m','n','v','h','y'];
-    $text = str_replace($persian, $english, $text);
+    // آرایه حروف فارسی و معادل انگلیسی
+    $persian = ['ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 
+                'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 
+                'ن', 'و', 'ه', 'ی'];
+    $english = ['a', 'b', 'p', 't', 's', 'j', 'ch', 'h', 'kh', 'd', 'z', 'r', 'z', 'zh',
+                's', 'sh', 's', 'z', 't', 'z', 'a', 'gh', 'f', 'gh', 'k', 'g', 'l', 'm',
+                'n', 'v', 'h', 'y'];
 
-    return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $text), '-'));
+    // تبدیل به حروف کوچک
+    $text = mb_strtolower($text, 'UTF-8');
+    
+    // جایگزینی حروف فارسی با انگلیسی
+    $text = str_replace($persian, $english, $text);
+    
+    // حذف کاراکترهای غیرمجاز و تبدیل فاصله به خط تیره
+    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
+    $text = preg_replace('/[\s-]+/', '-', $text);
+    $text = trim($text, '-');
+    
+    return $text;
+}
+
+/**
+ * ثبت فعالیت‌های سیستم
+ * @param string $module نام ماژول
+ * @param int $recordId شناسه رکورد
+ * @param string $action نوع عملیات
+ * @param string $details توضیحات
+ * @return bool نتیجه ثبت
+ */
+function logActivity($module, $recordId, $action, $details = '') {
+    global $db;
+    try {
+        $stmt = $db->prepare("
+            INSERT INTO activities (
+                module, record_id, action, details, 
+                user_id, ip_address, created_at
+            ) VALUES (
+                :module, :record_id, :action, :details,
+                :user_id, :ip_address, NOW()
+            )
+        ");
+
+        return $stmt->execute([
+            ':module' => $module,
+            ':record_id' => $recordId,
+            ':action' => $action,
+            ':details' => $details,
+            ':user_id' => $_SESSION['user_id'] ?? null,
+            ':ip_address' => $_SERVER['REMOTE_ADDR']
+        ]);
+    } catch (PDOException $e) {
+        error_log("Error in logActivity: " . $e->getMessage());
+        return false;
+    }
 }
 
 // تابع ثبت فعالیت دسته‌بندی
@@ -326,15 +395,40 @@ function logCategoryActivity($db, $categoryId, $action, $details = '') {
         ':details' => $details
     ]);
 }
-// تابع ایجاد پیام
-function createAlert($type, $message) {
-    if (!isset($_SESSION['alerts'])) {
-        $_SESSION['alerts'] = [];
-    }
-    $_SESSION['alerts'][] = [
+/**
+ * ایجاد پیام هشدار
+ * @param string $type نوع پیام (success, error, warning, info)
+ * @param string $message متن پیام
+ * @param string $title عنوان پیام (اختیاری)
+ */
+function createAlert($type, $message, $title = '') {
+    $_SESSION['alert'] = [
         'type' => $type,
-        'message' => $message
+        'message' => $message,
+        'title' => $title ?: ucfirst($type)
     ];
+}
+/**
+ * بررسی دسترسی کاربر
+ * @param string $permission نام دسترسی
+ * @return bool نتیجه بررسی
+ */
+function hasPermission($permission) {
+    // فعلاً همه دسترسی‌ها رو true برمی‌گردونیم
+    // بعداً سیستم دسترسی‌ها پیاده‌سازی میشه
+    return true;
+}
+
+/**
+ * بررسی دسترسی کاربر و نمایش خطا
+ * @param string $permission نام دسترسی
+ */
+function checkPermission($permission) {
+    if (!hasPermission($permission)) {
+        createAlert('error', 'شما دسترسی لازم برای این عملیات را ندارید');
+        header('Location: /dashboard.php');
+        exit;
+    }
 }
 
 // تابع نمایش پیام‌ها
