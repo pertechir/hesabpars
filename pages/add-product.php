@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/init.php';
+require_once '../includes/check_db.php';  // Add this line
 
 // بررسی لاگین بودن
 checkAuth();

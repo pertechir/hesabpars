@@ -22,45 +22,45 @@ function getUserInfo($userId) {
 
 $userInfo = isset($_SESSION['user_id']) ? getUserInfo($_SESSION['user_id']) : null;
 
-// منوهای سایدبار
-$menuItems = [
-    [
-        'title' => 'داشبورد',
-        'icon' => 'fas fa-home',
-        'url' => 'dashboard.php'
-    ],
-    [
-        'title' => 'محصولات',
-        'icon' => 'fas fa-box',
-        'submenu' => [
-            ['title' => 'لیست محصولات', 'url' => 'products.php', 'icon' => 'fas fa-list'],
-            ['title' => 'افزودن محصول', 'url' => 'add-product.php', 'icon' => 'fas fa-plus'],
-            ['title' => 'دسته‌بندی‌ها', 'url' => 'categories.php', 'icon' => 'fas fa-tags']
+    // منوهای سایدبار
+    $menuItems = [
+        [
+            'title' => 'داشبورد',
+            'icon' => 'fas fa-home',
+            'url' => BASE_URL . '/pages/dashboard.php'
+        ],
+        [
+            'title' => 'محصولات',
+            'icon' => 'fas fa-box',
+            'submenu' => [
+                ['title' => 'لیست محصولات', 'url' => BASE_URL . '/pages/products.php', 'icon' => 'fas fa-list'],
+                ['title' => 'افزودن محصول', 'url' => BASE_URL . '/pages/add-product.php', 'icon' => 'fas fa-plus'],
+                ['title' => 'دسته‌بندی‌ها', 'url' => BASE_URL . '/pages/categories.php', 'icon' => 'fas fa-tags']
+            ]
+        ],
+        [
+            'title' => 'مشتریان',
+            'icon' => 'fas fa-users',
+            'submenu' => [
+                ['title' => 'لیست مشتریان', 'url' => BASE_URL . '/pages/customers.php', 'icon' => 'fas fa-list'],
+                ['title' => 'افزودن مشتری', 'url' => BASE_URL . '/pages/add-customer.php', 'icon' => 'fas fa-user-plus']
+            ]
+        ],
+        [
+            'title' => 'مالی',
+            'icon' => 'fas fa-money-bill-wave',
+            'submenu' => [
+                ['title' => 'فاکتورها', 'url' => BASE_URL . '/pages/invoices.php', 'icon' => 'fas fa-file-invoice'],
+                ['title' => 'تراکنش‌ها', 'url' => BASE_URL . '/pages/transactions.php', 'icon' => 'fas fa-exchange-alt'],
+                ['title' => 'گزارشات', 'url' => BASE_URL . '/pages/reports.php', 'icon' => 'fas fa-chart-bar']
+            ]
+        ],
+        [
+            'title' => 'تنظیمات',
+            'icon' => 'fas fa-cog',
+            'url' => BASE_URL . '/pages/settings.php'
         ]
-    ],
-    [
-        'title' => 'مشتریان',
-        'icon' => 'fas fa-users',
-        'submenu' => [
-            ['title' => 'لیست مشتریان', 'url' => 'customers.php', 'icon' => 'fas fa-list'],
-            ['title' => 'افزودن مشتری', 'url' => 'add-customer.php', 'icon' => 'fas fa-user-plus']
-        ]
-    ],
-    [
-        'title' => 'مالی',
-        'icon' => 'fas fa-money-bill-wave',
-        'submenu' => [
-            ['title' => 'فاکتورها', 'url' => 'invoices.php', 'icon' => 'fas fa-file-invoice'],
-            ['title' => 'تراکنش‌ها', 'url' => 'transactions.php', 'icon' => 'fas fa-exchange-alt'],
-            ['title' => 'گزارشات', 'url' => 'reports.php', 'icon' => 'fas fa-chart-bar']
-        ]
-    ],
-    [
-        'title' => 'تنظیمات',
-        'icon' => 'fas fa-cog',
-        'url' => 'settings.php'
-    ]
-];
+    ];
 ?>
 
 <!DOCTYPE html>
