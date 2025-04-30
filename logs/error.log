@@ -1,0 +1,4 @@
+[01-May-2025 03:25:49 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:38) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:25:51 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:38) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:27:20 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:52) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:27:46 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57

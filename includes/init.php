@@ -4,24 +4,48 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Error handling setup
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+// Create logs directory if it doesn't exist
+$logPath = __DIR__ . '/../logs';
+if (!is_dir($logPath)) {
+    mkdir($logPath, 0777, true);
+}
+
+ini_set('error_log', $logPath . '/error.log');
+
+// Basic error handler
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    error_log("Error [$errno] $errstr on line $errline in file $errfile");
+    return false;
+});
+
 // Basic configurations
 define('BASE_PATH', realpath(dirname(__FILE__) . '/..'));
 define('BASE_URL', '/hesabpars');
 
-// Error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', BASE_PATH . '/logs/error.log');
+// Exception handler
+set_exception_handler(function($e) {
+    error_log("Uncaught Exception: " . $e->getMessage());
+    http_response_code(500);
+    if (ini_get('display_errors')) {
+        echo "خطای سیستمی: " . $e->getMessage();
+    } else {
+        echo "خطای سیستمی رخ داده است. لطفا با پشتیبانی تماس بگیرید.";
+    }
+    exit;
+});
+
 
 // Timezone
 date_default_timezone_set('Asia/Tehran');
 
 // Include required files
-require_once BASE_PATH . '/includes/config.php';
-require_once BASE_PATH . '/includes/auth.php';
-require_once BASE_PATH . '/includes/functions.php';
-require_once BASE_PATH . '/includes/jdf.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/auth.php';
 
 // Check if user is logged in
 function checkLogin() {

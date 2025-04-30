@@ -1,18 +1,25 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1); // اینو تغییر میدیم به 1 برای دیباگ
 // تنظیمات دیتابیس
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'hesabpars');
 define('DB_USER', 'root');
 define('DB_PASS', '');
+
+
 define('BASE_URL', '/hesabpars');
 // تنظیمات سایت
 define('SITE_NAME', 'حساب پارسه');
 define('SITE_URL', 'http://localhost/hesabpars');
+define('BASE_PATH', realpath(__DIR__ . '/..'));
 
 // تنظیمات امنیتی
 define('HASH_COST', 10);
 define('SESSION_LIFETIME', 3600);
-
+// تنظیمات کاربری
+define('AUTH_TIMEOUT', 3600); // 1 hour
+define('HASH_ALGO', PASSWORD_DEFAULT);
 // تنظیمات نمایشی
 define('ITEMS_PER_PAGE', 20);
 define('DATE_FORMAT', 'Y/m/d');
@@ -40,7 +47,8 @@ try {
         ]
     );
 } catch(PDOException $e) {
-    die("خطا در اتصال به دیتابیس: " . $e->getMessage());
+    error_log("Database Error: " . $e->getMessage());
+    die("خطا در اتصال به دیتابیس");
 }
 
 // توابع کمکی عمومی

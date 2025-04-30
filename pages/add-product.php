@@ -2,6 +2,9 @@
 require_once '../includes/init.php';
 require_once '../includes/check_db.php';  // Add this line
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 // بررسی لاگین بودن
 checkAuth();
 
@@ -12,8 +15,13 @@ checkPermission('add_products');
 
 // بررسی دسترسی با پیام خطای مناسب
 if (!hasPermission('add_products')) {
+    if (isAjaxRequest()) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'شما دسترسی لازم را ندارید']);
+        exit;
+    }
     $_SESSION['error'] = 'شما دسترسی لازم برای این عملیات را ندارید';
-    header('Location: ' . BASE_URL . '/pages/dashboard.php');
+    header('Location: ' . BASE_URL . '/dashboard.php');
     exit;
 }
 
@@ -22,6 +30,8 @@ if (!hasPermission('add_products')) {
 // دریافت لیست دسته‌بندی‌ها
 $categories = [];
 try {
+    // دریافت لیست دسته‌بندی‌ها
+    $categories = [];
     $stmt = $db->query("
         WITH RECURSIVE category_tree AS (
             SELECT 
@@ -41,8 +51,13 @@ try {
         ORDER BY path;
     ");
     $categories = $stmt->fetchAll();
+
+    // دریافت سایر داده‌های مورد نیاز
+    // ... کد قبلی ...
+
 } catch (PDOException $e) {
-    error_log("Error fetching categories: " . $e->getMessage());
+    error_log('Database Error: ' . $e->getMessage());
+    die('خطا در دریافت اطلاعات. لطفا با پشتیبانی تماس بگیرید.');
 }
 
 // دریافت لیست واحدها

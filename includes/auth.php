@@ -5,17 +5,24 @@ if (session_status() === PHP_SESSION_NONE) {
 // بررسی لاگین بودن کاربر
 function checkAuth() {
     if (!isset($_SESSION['user_id'])) {
-        header('Location: ' . BASE_URL . '/login.php');
+        if (isAjaxRequest()) {
+            header('Content-Type: application/json');
+            http_response_code(401);
+            echo json_encode([
+                'success' => false,
+                'message' => 'لطفاً وارد حساب کاربری خود شوید'
+            ]);
+        } else {
+            $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
+            header('Location: ' . BASE_URL . '/login.php');
+        }
         exit;
     }
+    return true;
 }
-/**
- * بررسی لاگین بودن کاربر
- * @return bool
- */
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
-}
+
+
+
 
 /**
  * بررسی لاگین بودن کاربر و ریدایرکت در صورت لاگین نبودن
