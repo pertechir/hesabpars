@@ -3,153 +3,133 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/functions.php';
 
-// بررسی دسترسی
-redirectIfNotLoggedIn();
-
-header('Content-Type: application/json');
+// دریافت متد درخواست
+$method = $_SERVER['REQUEST_METHOD'];
+$response = ['success' => false, 'message' => 'درخواست نامعتبر'];
 
 try {
-    switch ($_SERVER['REQUEST_METHOD']) {
+    switch ($method) {
         case 'GET':
-            // دریافت لیست دسته‌بندی‌ها
-            $search = $_GET['search'] ?? '';
-            $whereClause = $search ? "WHERE name LIKE :search OR description LIKE :search" : "";
-            
-            $stmt = $db->prepare("
-                SELECT 
-                    c.*,
-                    COUNT(DISTINCT p.id) as products_count,
-                    COUNT(DISTINCT s.id) as subcategories_count
-                FROM categories c 
-                LEFT JOIN products p ON p.category_id = c.id
-                LEFT JOIN categories s ON s.parent_id = c.id
-                $whereClause
-                GROUP BY c.id
-                ORDER BY c.sort_order
-            ");
-
-            if ($search) {
-                $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+            // دریافت اطلاعات دسته‌بندی
+            if (preg_match('/^\/(\d+)$/', $_SERVER['PATH_INFO'] ?? '', $matches)) {
+                $categoryId = (int)$matches[1];
+                $stmt = $db->prepare("
+                    SELECT c.*, GROUP_CONCAT(t.id) as tag_ids
+                    FROM categories c
+                    LEFT JOIN category_tags ct ON c.id = ct.category_id
+                    LEFT JOIN tags t ON ct.tag_id = t.id
+                    WHERE c.id = ?
+                    GROUP BY c.id
+                ");
+                $stmt->execute([$categoryId]);
+                $category = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($category) {
+                    $category['tag_ids'] = $category['tag_ids'] ? explode(',', $category['tag_ids']) : [];
+                    $response = ['success' => true, 'data' => $category];
+                } else {
+                    $response = ['success' => false, 'message' => 'دسته‌بندی یافت نشد'];
+                }
             }
-
-            $stmt->execute();
-            $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            echo json_encode([
-                'success' => true,
-                'categories' => $categories
-            ]);
+            // دریافت ساختار درختی
+            elseif ($_SERVER['PATH_INFO'] === '/tree') {
+                $stmt = $db->query("
+                    WITH RECURSIVE category_tree AS (
+                        SELECT 
+                            id, name, parent_id, status, icon,
+                            CAST(name AS CHAR(1000)) AS path
+                        FROM categories
+                        WHERE parent_id IS NULL
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            c.id, c.name, c.parent_id, c.status, c.icon,
+                            CONCAT(ct.path, ' > ', c.name)
+                        FROM categories c
+                        JOIN category_tree ct ON c.parent_id = ct.id
+                    )
+                    SELECT * FROM category_tree
+                    ORDER BY path
+                ");
+                
+                $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $tree = [];
+                
+                foreach ($categories as $category) {
+                    $node = [
+                        'id' => $category['id'],
+                        'text' => $category['name'],
+                        'icon' => $category['icon'] ?: 'fas fa-folder',
+                        'type' => $category['status'],
+                        'state' => ['opened' => true]
+                    ];
+                    
+                    if (!$category['parent_id']) {
+                        $tree[] = $node;
+                    } else {
+                        // پیدا کردن والد و اضافه کردن به children
+                        $parent = findParentNode($tree, $category['parent_id']);
+                        if ($parent) {
+                            if (!isset($parent['children'])) {
+                                $parent['children'] = [];
+                            }
+                            $parent['children'][] = $node;
+                        }
+                    }
+                }
+                
+                $response = ['success' => true, 'data' => $tree];
+            }
             break;
 
         case 'POST':
-            // افزودن دسته‌بندی جدید
-            $data = json_decode(file_get_contents('php://input'), true);
-            
-            $stmt = $db->prepare("
-                INSERT INTO categories (name, icon, description, parent_id, status, sort_order)
-                VALUES (:name, :icon, :description, :parent_id, :status, 
-                    (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM categories c2))
-            ");
-
-            $stmt->execute([
-                'name' => $data['name'],
-                'icon' => $data['icon'],
-                'description' => $data['description'],
-                'parent_id' => $data['parent_id'] ?: null,
-                'status' => $data['status'] ?? 'active'
-            ]);
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'دسته‌بندی با موفقیت ایجاد شد',
-                'id' => $db->lastInsertId()
-            ]);
+            if ($_SERVER['PATH_INFO'] === '/move') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $result = handleMoveCategory($db, $data);
+                $response = $result;
+            } else {
+                $result = handleAddCategory($db);
+                $response = $result;
+            }
             break;
 
         case 'PUT':
-            // ویرایش دسته‌بندی
-            $data = json_decode(file_get_contents('php://input'), true);
-
-            if (isset($data['action']) && $data['action'] === 'reorder') {
-                // بروزرسانی ترتیب دسته‌بندی‌ها
-                $stmt = $db->prepare("
-                    UPDATE categories 
-                    SET sort_order = CASE
-                        WHEN sort_order = :old THEN :new
-                        WHEN sort_order = :new THEN :old
-                        ELSE sort_order
-                    END
-                    WHERE sort_order IN (:old, :new)
-                ");
-
-                $stmt->execute([
-                    'old' => $data['oldIndex'],
-                    'new' => $data['newIndex']
-                ]);
-            } else {
-                // بروزرسانی اطلاعات دسته‌بندی
-                $stmt = $db->prepare("
-                    UPDATE categories 
-                    SET name = :name,
-                        icon = :icon,
-                        description = :description,
-                        parent_id = :parent_id,
-                        status = :status
-                    WHERE id = :id
-                ");
-
-                $stmt->execute([
-                    'id' => $data['id'],
-                    'name' => $data['name'],
-                    'icon' => $data['icon'],
-                    'description' => $data['description'],
-                    'parent_id' => $data['parent_id'] ?: null,
-                    'status' => $data['status']
-                ]);
+            if (preg_match('/^\/(\d+)$/', $_SERVER['PATH_INFO'] ?? '', $matches)) {
+                $_POST['category_id'] = (int)$matches[1];
+                $result = handleEditCategory($db);
+                $response = $result;
             }
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'بروزرسانی با موفقیت انجام شد'
-            ]);
             break;
 
         case 'DELETE':
-            // حذف دسته‌بندی
-            $id = $_GET['id'] ?? null;
-            if (!$id) {
-                throw new Exception('شناسه دسته‌بندی الزامی است');
+            if (preg_match('/^\/(\d+)$/', $_SERVER['PATH_INFO'] ?? '', $matches)) {
+                $_POST['category_id'] = (int)$matches[1];
+                $result = handleDeleteCategory($db);
+                $response = $result;
             }
-
-            // بررسی وجود محصول در دسته‌بندی
-            $stmt = $db->prepare("SELECT COUNT(*) FROM products WHERE category_id = ?");
-            $stmt->execute([$id]);
-            if ($stmt->fetchColumn() > 0) {
-                throw new Exception('این دسته‌بندی دارای محصول است و قابل حذف نیست');
-            }
-
-            // بررسی وجود زیردسته
-            $stmt = $db->prepare("SELECT COUNT(*) FROM categories WHERE parent_id = ?");
-            $stmt->execute([$id]);
-            if ($stmt->fetchColumn() > 0) {
-                throw new Exception('این دسته‌بندی دارای زیردسته است و قابل حذف نیست');
-            }
-
-            $stmt = $db->prepare("DELETE FROM categories WHERE id = ?");
-            $stmt->execute([$id]);
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'دسته‌بندی با موفقیت حذف شد'
-            ]);
             break;
-
-        default:
-            throw new Exception('متد درخواست نامعتبر است');
     }
 } catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ]);
+    $response = ['success' => false, 'message' => $e->getMessage()];
+}
+
+// ارسال پاسخ
+header('Content-Type: application/json; charset=utf-8');
+echo json_encode($response);
+
+// تابع کمکی برای پیدا کردن والد در درخت
+function findParentNode(&$nodes, $parentId) {
+    foreach ($nodes as &$node) {
+        if ($node['id'] === $parentId) {
+            return $node;
+        }
+        if (isset($node['children'])) {
+            $result = findParentNode($node['children'], $parentId);
+            if ($result) {
+                return $result;
+            }
+        }
+    }
+    return null;
 }
