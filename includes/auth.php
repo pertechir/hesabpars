@@ -38,14 +38,10 @@ function requireLogin() {
     }
 }
 
-
-
-/**
- * خروج کاربر از حساب کاربری
- */
+// تابع خروج کاربر
 function logout() {
     session_destroy();
-    header('Location: /login.php');
+    header('Location: login.php');
     exit;
 }
 

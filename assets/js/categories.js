@@ -480,17 +480,7 @@ function debounce(func, wait) {
     };
 }
 
-// نمایش لودینگ
-function showLoading() {
-    let loader = document.querySelector('.loading-overlay');
-    if (!loader) {
-        loader = document.createElement('div');
-        loader.className = 'loading-overlay';
-        loader.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loader);
-    }
-    loader.style.display = 'flex';
-}
+
 
 // مخفی کردن لودینگ
 function hideLoading() {
