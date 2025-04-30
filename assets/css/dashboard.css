@@ -1,7 +1,43 @@
-/* Dashboard Styles */
+/* Font Face Declarations */
+@font-face {
+    font-family: 'Anjoman';
+    src: url('../fonts/anjoman/AnjomanMax-Regular.woff2') format('woff2'),
+         url('../fonts/anjoman/AnjomanMax-Regular.woff') format('woff'),
+         url('../fonts/anjoman/AnjomanMax-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Anjoman';
+    src: url('../fonts/anjoman/AnjomanMax-Medium.woff2') format('woff2'),
+         url('../fonts/anjoman/AnjomanMax-Medium.woff') format('woff'),
+         url('../fonts/anjoman/AnjomanMax-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Anjoman', Tahoma, Arial;
+}
+
+body {
+    background: #f5f6fa;
+    color: #333;
+    line-height: 1.6;
+    font-weight: normal;
+}
+
+/* Dashboard Container */
 .dashboard-container {
     margin-right: 280px;
-    padding: 20px;
+    padding: 30px;
     transition: all 0.3s ease;
 }
 
@@ -9,53 +45,82 @@
     margin-right: 70px;
 }
 
+/* Dashboard Header */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    padding: 20px;
+    padding: 25px;
     background: #fff;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
 }
 
 .welcome-section h1 {
     font-size: 1.8em;
-    color: #333;
-    margin-bottom: 5px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .date-time {
-    color: #666;
-    font-size: 0.9em;
+    color: #7f8c8d;
+    font-size: 0.95em;
 }
 
+.refresh-btn {
+    background: #f8f9fa;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: #2c3e50;
+    cursor: pointer;
+    font-family: 'Anjoman';
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.refresh-btn:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+/* Stats Cards */
 .quick-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
     margin-bottom: 30px;
 }
 
 .stat-card {
     background: #fff;
-    padding: 20px;
+    padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     gap: 20px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
 }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
+    width: 65px;
+    height: 65px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 26px;
+    transition: all 0.3s ease;
 }
 
 .stat-icon.sales { background: #e3f2fd; color: #2196F3; }
@@ -63,30 +128,35 @@
 .stat-icon.products { background: #e8f5e9; color: #4caf50; }
 .stat-icon.income { background: #fff3e0; color: #ff9800; }
 
+.stat-card:hover .stat-icon {
+    transform: scale(1.1);
+}
+
 .stat-info h3 {
     font-size: 1.8em;
-    color: #333;
+    color: #2c3e50;
     margin-bottom: 5px;
+    font-weight: 500;
 }
 
 .stat-info p {
-    color: #666;
-    font-size: 0.9em;
-    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.95em;
 }
 
+/* Charts Section */
 .chart-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 25px;
     margin-bottom: 30px;
 }
 
 .chart-card {
     background: #fff;
-    padding: 20px;
+    padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
 }
 
 .chart-header {
@@ -98,27 +168,38 @@
 
 .chart-title {
     font-size: 1.2em;
-    color: #333;
+    color: #2c3e50;
+    font-weight: 500;
 }
 
 .chart-actions select {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: inherit;
+    padding: 8px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-family: 'Anjoman';
+    font-size: 0.9em;
+    color: #2c3e50;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
+.chart-actions select:hover {
+    border-color: #2196F3;
+}
+
+/* Recent Activities Section */
 .recent-section {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 20px;
+    gap: 25px;
 }
 
 .table-card {
     background: #fff;
-    padding: 20px;
+    padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
 }
 
 .table-header {
@@ -130,13 +211,20 @@
 
 .table-title {
     font-size: 1.2em;
-    color: #333;
+    color: #2c3e50;
+    font-weight: 500;
 }
 
 .view-all {
     color: #2196F3;
     text-decoration: none;
     font-size: 0.9em;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.view-all:hover {
+    color: #1976D2;
 }
 
 .recent-table {
@@ -146,23 +234,24 @@
 
 .recent-table th,
 .recent-table td {
-    padding: 12px;
+    padding: 15px;
     text-align: right;
     border-bottom: 1px solid #eee;
 }
 
 .recent-table th {
-    color: #666;
+    color: #7f8c8d;
     font-weight: 500;
     font-size: 0.9em;
 }
 
 .recent-table td {
-    color: #333;
+    color: #2c3e50;
+    font-size: 0.95em;
 }
 
 .status-badge {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.85em;
     font-weight: 500;
@@ -172,18 +261,29 @@
 .status-pending { background: #fff3e0; color: #ff9800; }
 .status-cancelled { background: #ffebee; color: #f44336; }
 
+/* Notifications */
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 .notification-card {
     padding: 15px;
     border-bottom: 1px solid #eee;
     display: flex;
     align-items: center;
     gap: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.notification-card:hover {
+    background: #f8f9fa;
 }
 
 .notification-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,22 +291,45 @@
 }
 
 .notification-info h4 {
-    color: #333;
+    color: #2c3e50;
     font-size: 1em;
     margin: 0 0 5px 0;
+    font-weight: 500;
 }
 
 .notification-info p {
-    color: #666;
-    font-size: 0.85em;
+    color: #7f8c8d;
+    font-size: 0.9em;
     margin: 0;
 }
 
 .notification-time {
-    color: #999;
+    color: #95a5a6;
     font-size: 0.8em;
+    margin-top: 5px;
+    display: block;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Responsive Design */
 @media (max-width: 1200px) {
     .chart-grid {
         grid-template-columns: 1fr;
@@ -217,15 +340,42 @@
     .recent-section {
         grid-template-columns: 1fr;
     }
+    
+    .quick-stats {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
     .dashboard-container {
         margin-right: 0;
+        padding: 15px;
     }
     
     .sidebar.collapsed + .dashboard-container {
         margin-right: 0;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .chart-card {
+        padding: 20px;
+    }
+    
+    .table-card {
+        padding: 20px;
+    }
+    
+    .recent-table {
+        font-size: 0.9em;
     }
 }
 
@@ -255,4 +405,14 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Fade Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }

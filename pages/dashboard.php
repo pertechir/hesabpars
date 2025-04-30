@@ -2,63 +2,106 @@
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/functions.php';
+require_once '../includes/jdf.php';
 
-// Check if user is logged in
-if (!isLoggedIn()) {
-    header('Location: login.php');
-    exit;
-}
+// بررسی لاگین بودن کاربر
+redirectIfNotLoggedIn();
+
+// مقادیر پیش‌فرض
+$todaySales = 0;
+$totalCustomers = 0;
+$totalProducts = 0;
+$monthlyIncome = 0;
+$recentInvoices = [];
+$recentNotifications = [];
+
+// دریافت آمار کلی
 try {
     $db = new PDO("mysql:host=localhost;dbname=hesabpars;charset=utf8mb4", "root", "");
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // آمار فروش امروز
-    $todaySales = $db->query("
+    $stmt = $db->query("
         SELECT COALESCE(SUM(total_amount), 0) as total 
         FROM invoices 
-        WHERE DATE(created_at) = CURDATE()
-    ")->fetch(PDO::FETCH_ASSOC)['total'];
+        WHERE DATE(created_at) = CURDATE() 
+        AND status = 'completed'
+    ");
+    $todaySales = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    // تعداد مشتریان
-    $totalCustomers = $db->query("
+    // تعداد مشتریان فعال
+    $stmt = $db->query("
         SELECT COUNT(*) as count 
         FROM customers 
         WHERE status = 'active'
-    ")->fetch(PDO::FETCH_ASSOC)['count'];
+    ");
+    $totalCustomers = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    // تعداد محصولات
-    $totalProducts = $db->query("
+    // تعداد محصولات موجود
+    $stmt = $db->query("
         SELECT COUNT(*) as count 
         FROM products 
-        WHERE status = 'active'
-    ")->fetch(PDO::FETCH_ASSOC)['count'];
+        WHERE status = 'active' 
+        AND stock > 0
+    ");
+    $totalProducts = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    // درآمد کل ماه
-    $monthlyIncome = $db->query("
+    // درآمد این ماه
+    $stmt = $db->query("
         SELECT COALESCE(SUM(total_amount), 0) as total 
         FROM invoices 
-        WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) 
+        WHERE MONTH(created_at) = MONTH(CURRENT_DATE())
         AND YEAR(created_at) = YEAR(CURRENT_DATE())
-    ")->fetch(PDO::FETCH_ASSOC)['total'];
+        AND status = 'completed'
+    ");
+    $monthlyIncome = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // آخرین فاکتورها
-    $recentInvoices = $db->query("
+    $stmt = $db->query("
         SELECT i.*, c.full_name as customer_name 
         FROM invoices i 
         LEFT JOIN customers c ON i.customer_id = c.id 
         ORDER BY i.created_at DESC 
         LIMIT 5
-    ")->fetchAll(PDO::FETCH_ASSOC);
+    ");
+    $recentInvoices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // آخرین اعلان‌ها
-    $recentNotifications = $db->query("
+    $stmt = $db->query("
         SELECT * FROM notifications 
         ORDER BY created_at DESC 
         LIMIT 5
-    ")->fetchAll(PDO::FETCH_ASSOC);
+    ");
+    $recentNotifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch(PDOException $e) {
-    $error = "خطا در دریافت اطلاعات: " . $e->getMessage();
+    error_log("Database Error: " . $e->getMessage());
+    createAlert('error', 'خطا در دریافت اطلاعات از دیتابیس');
+}
+
+// اضافه کردن چند داده نمونه برای تست
+if (empty($recentInvoices)) {
+    $recentInvoices = [
+        [
+            'invoice_number' => '1001',
+            'customer_name' => 'مشتری نمونه',
+            'total_amount' => 1500000,
+            'created_at' => date('Y-m-d H:i:s'),
+            'status' => 'completed'
+        ]
+    ];
+}
+
+if (empty($recentNotifications)) {
+    $recentNotifications = [
+        [
+            'title' => 'خوش آمدید',
+            'message' => 'به سیستم حسابداری پارسه خوش آمدید',
+            'icon' => 'fas fa-bell',
+            'color' => '#2196F3',
+            'created_at' => date('Y-m-d H:i:s')
+        ]
+    ];
 }
 ?>
 
