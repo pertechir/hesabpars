@@ -1,0 +1,568 @@
+:root {
+    /* رنگ‌های گرادینت شاد */
+    --gradient-1: linear-gradient(135deg, #FF6B6B, #FFE66D);
+    --gradient-2: linear-gradient(135deg, #4ECDC4, #556270);
+    --gradient-3: linear-gradient(135deg, #A8E6CF, #DCEDC1);
+    --gradient-4: linear-gradient(135deg, #FFD93D, #FF6B6B);
+    
+    /* سایه‌های سه بعدی */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
+    --shadow-xl: 0 12px 24px rgba(0,0,0,0.17);
+    
+    /* انیمیشن */
+    --transition-speed: 0.3s;
+}
+
+.register-page {
+    min-height: 100vh;
+    background: var(--gradient-1);
+    padding: 40px 20px;
+}
+
+.register-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+    perspective: 1000px;
+}
+
+.register-box {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow-xl);
+    transform-style: preserve-3d;
+    transition: transform var(--transition-speed);
+    animation: floatIn 0.6s ease-out;
+}
+
+.register-box:hover {
+    transform: translateZ(20px) rotateX(2deg) rotateY(-2deg);
+}
+
+@keyframes floatIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) rotateX(10deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+    }
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header .logo img {
+    height: 60px;
+    margin-bottom: 20px;
+}
+
+.register-header h1 {
+    font-size: 2em;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+/* فرم مرحله‌ای */
+.form-steps {
+    position: relative;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #eee;
+    z-index: 1;
+}
+
+.step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.step i {
+    width: 50px;
+    height: 50px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    color: #666;
+    transition: all var(--transition-speed);
+}
+
+.step.active i {
+    background: var(--gradient-2);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: var(--shadow-md);
+}
+
+.step span {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.step.active span {
+    color: var(--dark-color);
+    font-weight: bold;
+}
+
+/* محتوای مراحل */
+.step-content {
+    position: relative;
+    min-height: 400px;
+}
+
+.step-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(20px);
+    transition: all var(--transition-speed);
+}
+
+.step-pane.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+/* فیلدهای فرم */
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+        color: var(--dark-color);
+    font-weight: 500;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e1e1e1;
+    border-radius: 10px;
+    transition: all var(--transition-speed);
+    transform-style: preserve-3d;
+}
+
+.input-group:focus-within {
+    border-color: var(--primary-color);
+    transform: translateZ(5px);
+    box-shadow: var(--shadow-md);
+}
+
+.input-group i {
+    width: 40px;
+    text-align: center;
+    color: #666;
+    transition: color var(--transition-speed);
+}
+
+.input-group:focus-within i {
+    color: var(--primary-color);
+}
+
+.input-group input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    font-size: 1em;
+    color: var(--dark-color);
+}
+
+.input-group input:focus {
+    outline: none;
+}
+
+.hint {
+    display: block;
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.toggle-password {
+    background: none;
+    border: none;
+    padding: 0 10px;
+    color: #666;
+    cursor: pointer;
+    transition: color var(--transition-speed);
+}
+
+.toggle-password:hover {
+    color: var(--primary-color);
+}
+
+/* پلن‌های اشتراک */
+.subscription-plans {
+    margin-bottom: 30px;
+}
+
+.subscription-plans h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    perspective: 1000px;
+}
+
+.plan {
+    position: relative;
+    transition: transform var(--transition-speed);
+}
+
+.plan input[type="radio"] {
+    display: none;
+}
+
+.plan label {
+    display: block;
+    padding: 20px;
+    background: #fff;
+    border: 2px solid #eee;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    transform-style: preserve-3d;
+}
+
+.plan:hover label {
+    transform: translateZ(10px);
+    box-shadow: var(--shadow-md);
+}
+
+.plan input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(46, 204, 113, 0.1));
+    transform: translateZ(20px);
+    box-shadow: var(--shadow-lg);
+}
+
+.plan.recommended label {
+    border: 2px solid var(--primary-color);
+    background: var(--gradient-3);
+}
+
+.plan-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.plan-header h4 {
+    font-size: 1.2em;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.plan-price {
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+.plan-price .currency {
+    font-size: 0.6em;
+    margin-right: 5px;
+}
+
+.plan-features {
+    list-style: none;
+}
+
+.plan-features li {
+    margin-bottom: 10px;
+    padding-right: 20px;
+    position: relative;
+}
+
+.plan-features li::before {
+    content: '✓';
+    position: absolute;
+    right: 0;
+    color: var(--secondary-color);
+}
+
+/* پذیرش قوانین */
+.terms-group {
+    margin: 30px 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    position: relative;
+    transition: all var(--transition-speed);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+    background: var(--gradient-2);
+    border-color: transparent;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+}
+
+.terms-text a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* دکمه‌های اقدام */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--transition-speed);
+    transform-style: preserve-3d;
+}
+
+.btn:hover {
+    transform: translateZ(5px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background: var(--gradient-2);
+    color: #fff;
+}
+
+.btn-outline {
+    background: #fff;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-success {
+    background: var(--gradient-4);
+    color: #fff;
+}
+
+/* ویژگی‌های ثبت نام */
+.register-features {
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    transform-style: preserve-3d;
+    animation: floatIn 0.6s ease-out 0.3s backwards;
+}
+
+.register-features h2 {
+    color: #fff;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.features-grid {
+    display: grid;
+    gap: 30px;
+}
+
+.feature {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: all var(--transition-speed);
+    transform-style: preserve-3d;
+}
+
+.feature:hover {
+    transform: translateZ(10px);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.feature i {
+    font-size: 2em;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.feature h3 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.feature p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* انیمیشن‌های اضافی */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* رسپانسیو */
+@media (max-width: 1200px) {
+    .register-container {
+        grid-template-columns: 1fr;
+    }
+
+    .register-features {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .register-box {
+        padding: 20px;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+/* اصلاح استایل input-group */
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e1e1e1;
+    border-radius: 10px;
+    transition: all var(--transition-speed);
+    transform-style: preserve-3d;
+    z-index: 1; /* اضافه کردن z-index */
+}
+
+.input-group input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    font-size: 1em;
+    color: var(--dark-color);
+    position: relative;
+    z-index: 2; /* اضافه کردن z-index بالاتر برای input */
+    pointer-events: auto; /* فعال کردن pointer-events */
+}
+
+/* اصلاح استایل step-pane */
+.step-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(20px);
+    transition: all var(--transition-speed);
+    pointer-events: none; /* غیرفعال کردن pointer-events برای step-pane های غیرفعال */
+}
+
+.step-pane.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    pointer-events: auto; /* فعال کردن pointer-events برای step-pane فعال */
+    z-index: 1; /* اضافه کردن z-index */
+}
+
+/* اصلاح استایل register-box */
+.register-box {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow-xl);
+    transform-style: preserve-3d;
+    transition: transform var(--transition-speed);
+    animation: floatIn 0.6s ease-out;
+    position: relative; /* اضافه کردن position: relative */
+    z-index: 1; /* اضافه کردن z-index */
+}
+
+/* اصلاح استایل form */
+form {
+    position: relative;
+    z-index: 2; /* اضافه کردن z-index بالاتر از register-box */
+}
+
+/* اطمینان از دسترسی به همه المان‌های تعاملی */
+button,
+input,
+select,
+textarea {
+    pointer-events: auto !important;
+}
