@@ -1,16 +1,13 @@
 <?php
-require_once '../includes/config.php';
-require_once '../includes/auth.php';
-require_once '../includes/functions.php';
-require_once '../includes/jdf.php';
+require_once '../includes/init.php';
 
+// بررسی لاگین بودن
+checkAuth();
 
 // بررسی دسترسی
 checkPermission('add_products');
 
 
-// بررسی لاگین بودن
-checkAuth();
 
 // بررسی دسترسی با پیام خطای مناسب
 if (!hasPermission('add_products')) {
@@ -121,26 +118,23 @@ $defaultValues = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>افزودن محصول جدید | حسابپارس</title>
     
+    <!-- Base URL for assets -->
+    <base href="<?php echo url(); ?>">
+    
     <!-- Favicon -->
-    <link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="shortcut icon" href="<?php echo url('assets/images/favicon.ico'); ?>">
     
     <!-- CSS Files -->
-    <link rel="shortcut icon" href="../assets/images/favicon.ico">
-    <!-- Bootstrap RTL -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- Dropzone -->
     <link href="https://unpkg.com/dropzone@5.9.3/dist/min/dropzone.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../assets/css/main.css">
-    <link rel="stylesheet" href="../assets/css/products.css"></head>
-    <body>
+    <link rel="stylesheet" href="<?php echo url('assets/css/main.css'); ?>">
+    <link rel="stylesheet" href="<?php echo url('assets/css/products.css'); ?>">
+</head>
+<body>
 
     <!-- Sidebar -->
     <?php include_once '../../includes/sidebar.php'; ?>
@@ -469,20 +463,14 @@ $defaultValues = [
         </div>
     </div>
 
-    <!-- JS Files -->
-    <!-- jQuery -->
+    <!-- در انتهای فایل -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fa.js"></script>
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
-    <!-- Dropzone -->
     <script src="https://unpkg.com/dropzone@5.9.3/dist/min/dropzone.min.js"></script>
-    <!-- Custom JS -->
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/products.js"></script>
+    <script src="<?php echo url('assets/js/main.js'); ?>"></script>
+    <script src="<?php echo url('assets/js/products.js'); ?>"></script>
 </body>
 </html>

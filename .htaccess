@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /hesabpars/
+    
+    # اگر فایل یا دایرکتوری وجود نداشت
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # ریدایرکت به index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# امنیت دایرکتوری‌ها
+Options -Indexes
+
+# محافظت از فایل‌های حساس
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
