@@ -3,16 +3,27 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/functions.php';
 
-// دریافت متد درخواست
+header('Content-Type: application/json; charset=utf-8');
+
+// بررسی دسترسی کاربر
+if (!isLoggedIn()) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'دسترسی غیرمجاز']);
+    exit;
+}
+
+// دریافت متد درخواست و مسیر
 $method = $_SERVER['REQUEST_METHOD'];
-$response = ['success' => false, 'message' => 'درخواست نامعتبر'];
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$pathParts = explode('/', trim($path, '/'));
+$endpoint = end($pathParts);
 
 try {
     switch ($method) {
         case 'GET':
-            // دریافت اطلاعات دسته‌بندی
-            if (preg_match('/^\/(\d+)$/', $_SERVER['PATH_INFO'] ?? '', $matches)) {
-                $categoryId = (int)$matches[1];
+            // دریافت اطلاعات یک دسته‌بندی
+            if (is_numeric($endpoint)) {
+                $categoryId = (int)$endpoint;
                 $stmt = $db->prepare("
                     SELECT c.*, GROUP_CONCAT(t.id) as tag_ids
                     FROM categories c
@@ -26,99 +37,112 @@ try {
                 
                 if ($category) {
                     $category['tag_ids'] = $category['tag_ids'] ? explode(',', $category['tag_ids']) : [];
-                    $response = ['success' => true, 'data' => $category];
+                    echo json_encode(['success' => true, 'data' => $category]);
                 } else {
-                    $response = ['success' => false, 'message' => 'دسته‌بندی یافت نشد'];
+                    echo json_encode(['success' => false, 'message' => 'دسته‌بندی یافت نشد']);
                 }
             }
             // دریافت ساختار درختی
-            elseif ($_SERVER['PATH_INFO'] === '/tree') {
-                $stmt = $db->query("
-                    WITH RECURSIVE category_tree AS (
-                        SELECT 
-                            id, name, parent_id, status, icon,
-                            CAST(name AS CHAR(1000)) AS path
-                        FROM categories
-                        WHERE parent_id IS NULL
-                        
-                        UNION ALL
-                        
-                        SELECT 
-                            c.id, c.name, c.parent_id, c.status, c.icon,
-                            CONCAT(ct.path, ' > ', c.name)
-                        FROM categories c
-                        JOIN category_tree ct ON c.parent_id = ct.id
-                    )
-                    SELECT * FROM category_tree
-                    ORDER BY path
-                ");
-                
-                $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $tree = [];
-                
-                foreach ($categories as $category) {
-                    $node = [
-                        'id' => $category['id'],
-                        'text' => $category['name'],
-                        'icon' => $category['icon'] ?: 'fas fa-folder',
-                        'type' => $category['status'],
-                        'state' => ['opened' => true]
-                    ];
-                    
-                    if (!$category['parent_id']) {
-                        $tree[] = $node;
-                    } else {
-                        // پیدا کردن والد و اضافه کردن به children
-                        $parent = findParentNode($tree, $category['parent_id']);
-                        if ($parent) {
-                            if (!isset($parent['children'])) {
-                                $parent['children'] = [];
-                            }
-                            $parent['children'][] = $node;
-                        }
-                    }
-                }
-                
-                $response = ['success' => true, 'data' => $tree];
+            elseif ($endpoint === 'tree') {
+                $categories = getCategoryTree($db);
+                echo json_encode(['success' => true, 'data' => $categories]);
             }
             break;
 
         case 'POST':
-            if ($_SERVER['PATH_INFO'] === '/move') {
-                $data = json_decode(file_get_contents('php://input'), true);
-                $result = handleMoveCategory($db, $data);
-                $response = $result;
-            } else {
+            $input = json_decode(file_get_contents('php://input'), true);
+            
+            // جابجایی دسته‌بندی
+            if ($endpoint === 'move' && !empty($input)) {
+                $result = handleMoveCategory($db);
+                echo json_encode($result);
+            }
+            // ایجاد دسته‌بندی جدید
+            else {
                 $result = handleAddCategory($db);
-                $response = $result;
+                echo json_encode($result);
             }
             break;
 
         case 'PUT':
-            if (preg_match('/^\/(\d+)$/', $_SERVER['PATH_INFO'] ?? '', $matches)) {
-                $_POST['category_id'] = (int)$matches[1];
+            if (is_numeric($endpoint)) {
+                $_POST = json_decode(file_get_contents('php://input'), true);
+                $_POST['category_id'] = (int)$endpoint;
                 $result = handleEditCategory($db);
-                $response = $result;
+                echo json_encode($result);
             }
             break;
 
         case 'DELETE':
-            if (preg_match('/^\/(\d+)$/', $_SERVER['PATH_INFO'] ?? '', $matches)) {
-                $_POST['category_id'] = (int)$matches[1];
-                $result = handleDeleteCategory($db);
-                $response = $result;
+            if (is_numeric($endpoint)) {
+                $result = handleDeleteCategory($db, (int)$endpoint);
+                echo json_encode($result);
             }
             break;
+
+        default:
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'متد درخواست نامعتبر است']);
     }
+
 } catch (Exception $e) {
-    $response = ['success' => false, 'message' => $e->getMessage()];
+    error_log($e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'خطای سرور']);
 }
 
-// ارسال پاسخ
-header('Content-Type: application/json; charset=utf-8');
-echo json_encode($response);
+// دریافت ساختار درختی دسته‌بندی‌ها
+function getCategoryTree($db) {
+    $stmt = $db->query("
+        WITH RECURSIVE category_tree AS (
+            SELECT 
+                id, name, parent_id, status, icon,
+                CAST(name AS CHAR(1000)) AS path
+            FROM categories
+            WHERE parent_id IS NULL
+            
+            UNION ALL
+            
+            SELECT 
+                c.id, c.name, c.parent_id, c.status, c.icon,
+                CONCAT(ct.path, ' > ', c.name)
+            FROM categories c
+            JOIN category_tree ct ON c.parent_id = ct.id
+        )
+        SELECT * FROM category_tree
+        ORDER BY path
+    ");
+    
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $tree = [];
+    
+    foreach ($categories as $category) {
+        $node = [
+            'id' => $category['id'],
+            'text' => $category['name'],
+            'icon' => $category['icon'] ?: 'fas fa-folder',
+            'type' => $category['status'],
+            'state' => ['opened' => true]
+        ];
+        
+        if (!$category['parent_id']) {
+            $tree[] = $node;
+        } else {
+            // پیدا کردن والد و اضافه کردن به children
+            $parent = findParentNode($tree, $category['parent_id']);
+            if ($parent) {
+                if (!isset($parent['children'])) {
+                    $parent['children'] = [];
+                }
+                $parent['children'][] = $node;
+            }
+        }
+    }
+    
+    return $tree;
+}
 
-// تابع کمکی برای پیدا کردن والد در درخت
+// پیدا کردن گره والد در درخت
 function findParentNode(&$nodes, $parentId) {
     foreach ($nodes as &$node) {
         if ($node['id'] === $parentId) {
