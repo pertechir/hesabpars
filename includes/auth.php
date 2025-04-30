@@ -33,3 +33,17 @@ function redirectIfNotAdmin() {
         exit;
     }
 }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// بررسی دسترسی کاربر
+function checkPermission($permission) {
+    return true; // فعلاً همه دسترسی‌ها رو مجاز می‌کنیم
+}
+
+// بررسی وجود دسترسی
+function hasPermission($permission) {
+    return true; // فعلاً همه دسترسی‌ها رو مجاز می‌کنیم
+}
+
