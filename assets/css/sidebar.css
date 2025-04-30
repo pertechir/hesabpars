@@ -27,7 +27,7 @@
     top: 0;
     transition: all 0.3s ease;
     z-index: 1000;
-    font-family: 'Anjoman', Tahoma, Arial;
+        font-family: 'Anjoman Max';
     box-shadow: -2px 0 10px rgba(0,0,0,0.05);
 }
 
