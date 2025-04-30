@@ -2,551 +2,413 @@
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/functions.php';
+require_once '../includes/jdf.php';
 
+// بررسی دسترسی
 checkPermission('view_categories');
 
-// تنظیمات نمایش و فیلترها
-$perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
-$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($currentPage - 1) * $perPage;
-
-$searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
-$filterStatus = isset($_GET['status']) ? trim($_GET['status']) : '';
-$parentId = isset($_GET['parent']) ? (int)$_GET['parent'] : null;
-$sortBy = isset($_GET['sort']) ? trim($_GET['sort']) : 'id';
-$sortOrder = isset($_GET['order']) && strtolower($_GET['order']) === 'desc' ? 'DESC' : 'ASC';
-
-// لیست فیلدهای مجاز برای مرتب‌سازی
-$allowedSortFields = ['id', 'name', 'status', 'products_count', 'created_at', 'sort_order'];
-if (!in_array($sortBy, $allowedSortFields)) {
-    $sortBy = 'id';
-}
-
-$errors = [];
-$stats = [];
-$categories = [];
-
+// دریافت آمار دسته‌بندی‌ها
 try {
-    // دریافت آمار کلی
-    $statsQuery = $db->query("
-        SELECT 
-            COUNT(*) as total,
-            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-            SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive,
-            COUNT(CASE WHEN parent_id IS NULL THEN 1 END) as parent,
-            COUNT(CASE WHEN parent_id IS NOT NULL THEN 1 END) as child
-        FROM categories
-    ");
-    $stats = $statsQuery->fetch(PDO::FETCH_ASSOC);
-
-    // ساخت شرط‌های SQL برای فیلتر
-    $whereConditions = [];
-    $params = [];
-
-    if ($filterStatus) {
-        $whereConditions[] = "c.status = :status";
-        $params[':status'] = $filterStatus;
-    }
-
-    if ($searchQuery) {
-        $whereConditions[] = "(
-            c.name LIKE :search OR 
-            c.slug LIKE :search OR 
-            c.description LIKE :search
-        )";
-        $params[':search'] = "%{$searchQuery}%";
-    }
-
-    if ($parentId !== null) {
-        $whereConditions[] = "c.parent_id " . ($parentId === 0 ? "IS NULL" : "= :parent_id");
-        if ($parentId !== 0) {
-            $params[':parent_id'] = $parentId;
-        }
-    }
-
-    $whereClause = $whereConditions ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
-
-    // دریافت تعداد کل برای صفحه‌بندی
-    $countQuery = "SELECT COUNT(*) FROM categories c $whereClause";
-    $stmt = $db->prepare($countQuery);
-    $stmt->execute($params);
-    $totalItems = $stmt->fetchColumn();
-    $totalPages = ceil($totalItems / $perPage);
-
-    // اصلاح شماره صفحه اگر نامعتبر باشد
-    if ($currentPage > $totalPages) {
-        $currentPage = $totalPages;
-        $offset = ($currentPage - 1) * $perPage;
-    }
-
-    // دریافت دسته‌بندی‌ها
-    $query = "
-        SELECT 
-            c.*,
-            p.name as parent_name,
-            u1.username as created_by_username,
-            u2.username as updated_by_username,
-            (SELECT COUNT(*) FROM categories WHERE parent_id = c.id) as children_count,
-            (SELECT COUNT(*) FROM products WHERE category_id = c.id) as products_count
-        FROM categories c
-        LEFT JOIN categories p ON c.parent_id = p.id
-        LEFT JOIN users u1 ON c.created_by = u1.id
-        LEFT JOIN users u2 ON c.last_updated_by = u2.id
-        $whereClause
-        ORDER BY c.$sortBy $sortOrder
-        LIMIT :offset, :limit
-    ";
-
-    $stmt = $db->prepare($query);
-    foreach ($params as $key => $value) {
-        $stmt->bindValue($key, $value);
-    }
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-    $stmt->execute();
+    global $db;  // استفاده از متغیر دیتابیس تعریف شده در config.php
     
-    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $db->query("SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+        SUM(CASE WHEN parent_id IS NULL THEN 1 ELSE 0 END) as parents,
+        SUM(CASE WHEN parent_id IS NOT NULL THEN 1 ELSE 0 END) as children
+    FROM categories");
+    $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // دریافت لیست والدین برای درختواره
-    $parentsQuery = $db->query("
-        SELECT id, name, icon 
-        FROM categories 
-        WHERE parent_id IS NULL 
-        ORDER BY name
-    ");
-    $parents = $parentsQuery->fetchAll(PDO::FETCH_ASSOC);
+    // دریافت لیست دسته‌بندی‌ها به صورت درختی
+    function getCategoryTree($db, $parentId = null) {
+        $stmt = $db->prepare("
+            SELECT c.*, 
+                   COUNT(p.id) as product_count,
+                   u.full_name as created_by_name
+            FROM categories c
+            LEFT JOIN products p ON p.category_id = c.id
+            LEFT JOIN users u ON c.created_by = u.id
+            WHERE c.parent_id " . ($parentId === null ? "IS NULL" : "= ?") . "
+            GROUP BY c.id
+            ORDER BY c.position ASC, c.name ASC
+        ");
+        
+        if ($parentId === null) {
+            $stmt->execute();
+        } else {
+            $stmt->execute([$parentId]);
+        }
+        
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($categories as &$category) {
+            $category['children'] = getCategoryTree($db, $category['id']);
+        }
+        
+        return $categories;
+    }
 
-} catch (PDOException $e) {
-    error_log("Database Error in categories.php: " . $e->getMessage());
-    $errors[] = "خطا در دریافت اطلاعات دسته‌بندی‌ها";
+    $categories = getCategoryTree($db);
+
+} catch(PDOException $e) {
+    error_log("Database Error: " . $e->getMessage());
+    createAlert('error', 'خطا در دریافت اطلاعات از دیتابیس');
+    // مقداردهی پیش‌فرض برای جلوگیری از خطا
+    $stats = [
+        'total' => 0,
+        'active' => 0,
+        'parents' => 0,
+        'children' => 0
+    ];
+    $categories = [];
 }
 
-// نمایش صفحه
-$pageTitle = 'مدیریت دسته‌بندی‌ها';
-$pageDescription = 'مدیریت دسته‌بندی‌های محصولات';
-$pageClass = 'categories-page';
-
-include '../templates/header.php';
+$pageTitle = "مدیریت دسته‌بندی‌ها";
 ?>
 
-<!-- محتوای اصلی صفحه -->
-<div class="page-content">
-    <div class="container-fluid">
-        <!-- نوار بالای صفحه -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h1 class="page-title">
-                    <i class="fas fa-folder-tree"></i>
-                    <?php echo $pageTitle; ?>
-                    <small class="text-muted font-size-sm"><?php echo number_format($totalItems); ?> دسته‌بندی</small>
-                </h1>
-            </div>
-            <div class="col-md-6 text-end">
-                <?php if (hasPermission('add_category')): ?>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                    <i class="fas fa-plus"></i>
-                    افزودن دسته‌بندی
-                </button>
-                <?php endif; ?>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $pageTitle; ?> - حساب پارسه</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="../assets/css/categories.css">
+</head>
+<body>
+    <?php include '../includes/sidebar.php'; ?>
 
-        <!-- کارت‌های آمار -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card card-stats bg-primary text-white">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box">
-                                <i class="fas fa-folder"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h3 class="card-title mb-1"><?php echo number_format($stats['total']); ?></h3>
-                                <p class="card-text mb-0">کل دسته‌بندی‌ها</p>
-                            </div>
-                        </div>
-                    </div>
+    <div class="category-container">
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo number_format($stats['total']); ?></h3>
+                    <p>کل دسته‌بندی‌ها</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card card-stats bg-success text-white">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h3 class="card-title mb-1"><?php echo number_format($stats['active']); ?></h3>
-                                <p class="card-text mb-0">دسته‌بندی‌های فعال</p>
-                            </div>
-                        </div>
-                    </div>
+
+            <div class="stat-card">
+                <div class="stat-icon active">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo number_format($stats['active']); ?></h3>
+                    <p>دسته‌بندی‌های فعال</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card card-stats bg-warning text-white">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box">
-                                <i class="fas fa-folder-tree"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h3 class="card-title mb-1"><?php echo number_format($stats['parent']); ?></h3>
-                                <p class="card-text mb-0">دسته‌بندی‌های اصلی</p>
-                            </div>
-                        </div>
-                    </div>
+
+            <div class="stat-card">
+                <div class="stat-icon parent">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo number_format($stats['parents']); ?></h3>
+                    <p>دسته‌بندی‌های اصلی</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card card-stats bg-info text-white">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box">
-                                <i class="fas fa-code-branch"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h3 class="card-title mb-1"><?php echo number_format($stats['child']); ?></h3>
-                                <p class="card-text mb-0">زیر دسته‌ها</p>
-                            </div>
-                        </div>
-                    </div>
+
+            <div class="stat-card">
+                <div class="stat-icon child">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="stat
+
+-info">
+                    <h3><?php echo number_format($stats['children']); ?></h3>
+                    <p>زیر دسته‌ها</p>
                 </div>
             </div>
         </div>
 
-        <!-- فیلترها و جستجو -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" class="form-control" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="جستجو...">
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="categorySearch" class="form-control" placeholder="جستجو در دسته‌بندی‌ها...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="statusFilter" class="form-select">
+                        <option value="">همه وضعیت‌ها</option>
+                        <option value="active">فعال</option>
+                        <option value="inactive">غیرفعال</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="parentFilter" class="form-select">
+                        <option value="">همه دسته‌بندی‌ها</option>
+                        <option value="parent">دسته‌های اصلی</option>
+                        <option value="child">زیردسته‌ها</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Category Tree -->
+        <div class="category-tree">
+            <div class="tree-header">
+                <h2 class="tree-title">ساختار دسته‌بندی‌ها</h2>
+                <div class="category-actions">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="expandAll">
+                        <i class="fas fa-plus-square"></i> باز کردن همه
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="collapseAll">
+                        <i class="fas fa-minus-square"></i> بستن همه
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="fas fa-plus"></i> افزودن دسته‌بندی
+                    </button>
+                </div>
+            </div>
+
+            <div class="tree-view">
+                <?php
+                function renderCategoryTree($categories, $level = 0) {
+                    foreach ($categories as $category) {
+                        $hasChildren = !empty($category['children']);
+                        ?>
+                        <div class="tree-item" data-id="<?php echo $category['id']; ?>">
+                            <div class="drag-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <?php if ($hasChildren): ?>
+                                <button class="btn btn-link btn-sm toggle-children">
+                                    <i class="fas fa-caret-down"></i>
+                                </button>
+                            <?php else: ?>
+                                <span style="width: 28px;"></span>
+                            <?php endif; ?>
+                            
+                            <div class="category-name">
+                                <?php echo str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $level); ?>
+                                <?php echo htmlspecialchars($category['name']); ?>
+                                <small class="text-muted">(<?php echo $category['product_count']; ?> محصول)</small>
+                            </div>
+                            
+                            <div class="category-actions">
+                                <button type="button" class="btn btn-outline-info btn-sm" 
+                                        onclick="window.location.href='category-details.php?id=<?php echo $category['id']; ?>'">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm edit-category" 
+                                        data-id="<?php echo $category['id']; ?>">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm toggle-status" 
+                                        data-id="<?php echo $category['id']; ?>"
+                                        data-status="<?php echo $category['status']; ?>">
+                                    <i class="fas fa-power-off"></i>
+                                </button>
+                                <?php if ($category['product_count'] == 0 && empty($category['children'])): ?>
+                                    <button type="button" class="btn btn-outline-danger btn-sm delete-category" 
+                                            data-id="<?php echo $category['id']; ?>">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php if ($hasChildren): ?>
+                            <div class="tree-branch">
+                                <?php renderCategoryTree($category['children'], $level + 1); ?>
+                            </div>
+                        <?php endif;
+                    }
+                }
+
+                renderCategoryTree($categories);
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">افزودن دسته‌بندی جدید</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addCategoryForm">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">نام دسته‌بندی</label>
+                                <input type="text" class="form-control category-name-input" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">نامک (Slug)</label>
+                                <input type="text" class="form-control category-slug-input" name="slug">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">دسته‌بندی والد</label>
+                                <select class="form-select select2" name="parent_id">
+                                    <option value="">دسته‌بندی اصلی</option>
+                                    <?php
+                                    function renderCategoryOptions($categories, $level = 0) {
+                                        foreach ($categories as $category) {
+                                            echo '<option value="' . $category['id'] . '">' . 
+                                                 str_repeat('— ', $level) . htmlspecialchars($category['name']) . 
+                                                 '</option>';
+                                            if (!empty($category['children'])) {
+                                                renderCategoryOptions($category['children'], $level + 1);
+                                            }
+                                        }
+                                    }
+                                    renderCategoryOptions($categories);
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">وضعیت</label>
+                                <select class="form-select" name="status">
+                                    <option value="active">فعال</option>
+                                    <option value="inactive">غیرفعال</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">توضیحات</label>
+                                <textarea class="form-control" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">آیکون</label>
+                                <input type="text" class="form-control" name="icon" placeholder="مثال: fas fa-folder">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">رنگ</label>
+                                <input type="color" class="form-control form-control-color w-100" name="color" value="#563d7c">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">تصویر شاخص</label>
+                                <input type="file" class="form-control" name="thumbnail" accept="image/*">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">همه وضعیت‌ها</option>
-                            <option value="active" <?php echo $filterStatus === 'active' ? 'selected' : ''; ?>>فعال</option>
-                            <option value="inactive" <?php echo $filterStatus === 'inactive' ? 'selected' : ''; ?>>غیرفعال</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="parent" class="form-select">
-                            <option value="">همه دسته‌بندی‌ها</option>
-                            <option value="0" <?php echo $parentId === 0 ? 'selected' : ''; ?>>فقط دسته‌های اصلی</option>
-                            <?php foreach ($parents as $parent): ?>
-                            <option value="<?php echo $parent['id']; ?>" <?php echo $parentId === $parent['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($parent['name']); ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-filter"></i>
-                            اعمال فیلتر
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> ذخیره
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-
-        <!-- جدول دسته‌بندی‌ها -->
-        <div class="card">
-            <div class="card-body">
-                <?php if ($errors): ?>
-                    <?php foreach ($errors as $error): ?>
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <?php echo $error; ?>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-
-                <?php if ($categories): ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="checkAll">
-                                        </div>
-                                    </th>
-                                    <th style="width: 80px">
-                                        <a href="?sort=id&order=<?php echo $sortBy === 'id' && $sortOrder === 'ASC' ? 'desc' : 'asc'; ?>" class="text-decoration-none text-dark">
-                                            شناسه
-                                            <?php if ($sortBy === 'id'): ?>
-                                                <i class="fas fa-sort-<?php echo $sortOrder === 'ASC' ? 'up' : 'down'; ?>"></i>
-                                            <?php endif; ?>
-                                        </a>
-                                    </th>
-                                    <th>
-                                        <a href="?sort=name&order=<?php echo $sortBy === 'name' && $sortOrder === 'ASC' ? 'desc' : 'asc'; ?>" class="text-decoration-none text-dark">
-                                            نام
-                                            <?php if ($sortBy === 'name'): ?>
-                                                <i class="fas fa-sort-<?php echo $sortOrder === 'ASC' ? 'up' : 'down'; ?>"></i>
-                                            <?php endif; ?>
-                                        </a>
-                                    </th>
-                                    <th>والد</th>
-                                    <th style="width: 120px">
-                                        <a href="?sort=status&order=<?php echo $sortBy === 'status' && $sortOrder === 'ASC' ? 'desc' : 'asc'; ?>" class="text-decoration-none text-dark">
-                                            وضعیت
-                                            <?php if ($sortBy === 'status'): ?>
-                                                <i class="fas fa-sort-<?php echo $sortOrder === 'ASC' ? 'up' : 'down'; ?>"></i>
-                                            <?php endif; ?>
-                                        </a>
-                                    </th>
-                                    <th style="width: 100px">زیردسته‌ها</th>
-                                    <th style="width: 100px">محصولات</th>
-                                    <th style="width: 180px">آخرین بروزرسانی</th>
-                                    <th style="width: 150px">عملیات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($categories as $category): ?>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input category-checkbox" value="<?php echo $category['id']; ?>">
-                                        </div>
-                                    </td>
-                                    <td><?php echo $category['id']; ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="<?php echo htmlspecialchars($category['icon']); ?> me-2"></i>
-                                            <?php echo htmlspecialchars($category['name']); ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <?php if ($category['parent_name']): ?>
-                                            <span class="badge bg-light text-dark">
-                                                <i class="fas fa-folder-tree"></i>
-                                                <?php echo htmlspecialchars($category['parent_name']); ?>
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">دسته اصلی</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($category['status'] === 'active'): ?>
-                                            <span class="badge bg-success">فعال</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger">غیرفعال</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">
-                                            <?php echo number_format($category['children_count']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary">
-                                            <?php echo number_format($category['products_count']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php if ($category['updated_at']): ?>
-                                            <small class="text-muted">
-                                                <?php echo jdate('Y/m/d H:i', strtotime($category['updated_at'])); ?>
-                                                <?php if ($category['updated_by_username']): ?>
-                                                    <br>توسط: <?php echo htmlspecialchars($category['updated_by_username']); ?>
-                                                <?php endif; ?>
-                                            </small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <?php if (hasPermission('edit_category')): ?>
-                                            <button type="button" class="btn btn-sm btn-info edit-category" data-id="<?php echo $category['id']; ?>">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('delete_category')): ?>
-                                            <button type="button" class="btn btn-sm btn-danger delete-category" data-id="<?php echo $category['id']; ?>">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- صفحه‌بندی -->
-                    <?php if ($totalPages > 1): ?>
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li class="page-item <?php echo $i === $currentPage ? 'active' : ''; ?>">
-                                <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($searchQuery); ?>&status=<?php echo urlencode($filterStatus); ?>&parent=<?php echo $parentId; ?>&sort=<?php echo $sortBy; ?>&order=<?php echo $sortOrder; ?>">
-                                    <?php echo $i; ?>
-                                </a>
-                            </li>
-                            <?php endfor; ?>
-                        </ul>
-                    </nav>
-                    <?php endif; ?>
-
-                <?php else: ?>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        هیچ دسته‌بندی یافت نشد.
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
     </div>
-</div>
 
-<!-- مودال افزودن دسته‌بندی -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="addCategoryForm">
-                <div class="modal-header">
-                    <h5 class="modal-title">افزودن دسته‌بندی جدید</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">نام <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">نامک</label>
-                            <input type="text" class="form-control" name="slug" dir="ltr">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">آیکون</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="icon" value="fas fa-folder">
-                                <button type="button" class="btn btn-outline-secondary" id="iconPickerBtn">
-                                    <i class="fas fa-icons"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">رنگ</label>
-                            <input type="text" class="form-control color-picker" name="color" value="#2196F3">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">والد</label>
-                            <select class="form-select select2" name="parent_id">
-                                <option value="">بدون والد</option>
-                                <?php foreach ($parents as $parent): ?>
-                                <option value="<?php echo $parent['id']; ?>">
-                                    <?php echo htmlspecialchars($parent['name']); ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">توضیحات</label>
-                            <textarea class="form-control" name="description" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">وضعیت</label>
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" name="status" value="active" checked>
-                                <label class="form-check-label">فعال</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" name="status" value="inactive">
-                                <label class="form-check-label">غیرفعال</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        ذخیره
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- مودال ویرایش دسته‌بندی -->
-<div class="modal fade" id="editCategoryModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="editCategoryForm">
-                <input type="hidden" name="category_id">
+    <!-- Edit Category Modal -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">ویرایش دسته‌بندی</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">نام <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">نامک</label>
-                            <input type="text" class="form-control" name="slug" dir="ltr">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">آیکون</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="icon">
-                                <button type="button" class="btn btn-outline-secondary" id="editIconPickerBtn">
-                                    <i class="fas fa-icons"></i>
-                                </button>
+                <form id="editCategoryForm">
+                                        <input type="hidden" name="category_id" id="editCategoryId">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">نام دسته‌بندی</label>
+                                <input type="text" class="form-control category-name-input" name="name" id="editCategoryName" required>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">رنگ</label>
-                            <input type="text" class="form-control color-picker" name="color">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">والد</label>
-                            <select class="form-select select2" name="parent_id">
-                                <option value="">بدون والد</option>
-                                <?php foreach ($parents as $parent): ?>
-                                <option value="<?php echo $parent['id']; ?>">
-                                    <?php echo htmlspecialchars($parent['name']); ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">توضیحات</label>
-                            <textarea class="form-control" name="description" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">وضعیت</label>
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" name="status" value="active">
-                                <label class="form-check-label">فعال</label>
+                            <div class="col-md-6">
+                                <label class="form-label">نامک (Slug)</label>
+                                <input type="text" class="form-control category-slug-input" name="slug" id="editCategorySlug">
                             </div>
-                            <div class="form-check">
-                                <input type="radio" class="form-check-input" name="status" value="inactive">
-                                <label class="form-check-label">غیرفعال</label>
+                            <div class="col-md-6">
+                                <label class="form-label">دسته‌بندی والد</label>
+                                <select class="form-select select2" name="parent_id" id="editCategoryParent">
+                                    <option value="">دسته‌بندی اصلی</option>
+                                    <?php renderCategoryOptions($categories); ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">وضعیت</label>
+                                <select class="form-select" name="status" id="editCategoryStatus">
+                                    <option value="active">فعال</option>
+                                    <option value="inactive">غیرفعال</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">توضیحات</label>
+                                <textarea class="form-control" name="description" id="editCategoryDescription" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">آیکون</label>
+                                <input type="text" class="form-control" name="icon" id="editCategoryIcon" placeholder="مثال: fas fa-folder">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">رنگ</label>
+                                <input type="color" class="form-control form-control-color w-100" name="color" id="editCategoryColor">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">تصویر شاخص جدید</label>
+                                <input type="file" class="form-control" name="thumbnail" accept="image/*">
+                            </div>
+                            <div class="col-md-12" id="currentThumbnail">
+                                <!-- نمایش تصویر فعلی -->
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        ذخیره تغییرات
-                    </button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> بروزرسانی
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<?php include '../templates/footer.php'; ?>
+    <!-- Bulk Action Modal -->
+    <div class="modal fade" id="bulkActionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">عملیات گروهی</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="bulkActionForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">انتخاب عملیات</label>
+                            <select class="form-select" id="bulkAction" name="action" required>
+                                <option value="">انتخاب کنید...</option>
+                                <option value="activate">فعال کردن</option>
+                                <option value="deactivate">غیرفعال کردن</option>
+                                <option value="delete">حذف</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="submit" class="btn btn-primary">اجرای عملیات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="../assets/js/categories.js"></script>
+</body>
+</html>

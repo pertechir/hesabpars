@@ -1,460 +1,220 @@
-/* متغیرهای CSS */
-:root {
-    --primary-color: #2196F3;
-    --secondary-color: #607D8B;
-    --success-color: #4CAF50;
-    --danger-color: #F44336;
-    --warning-color: #FFC107;
-    --info-color: #00BCD4;
-    --dark-color: #333;
-    --light-color: #f8f9fa;
-    --border-color: #dee2e6;
-    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075);
-    --shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-    --radius: 0.5rem;
-    --transition: all 0.3s ease;
+/* Categories Page Styles */
+.category-container {
+    padding: 20px;
+    margin-right: var(--sidebar-width);
 }
 
-/* تنظیمات کلی */
-body {
-    font-family: 'Anjoman Max';
-    background-color: #f5f6fa;
-    color: var(--dark-color);
-    line-height: 1.6;
-}
-/* اضافه کردن استایل‌های ضروری */
-.header-actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    color: white;
-}
-
-.form-select, .form-control {
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem;
-}
-
-/* اصلاح استایل مودال */
-.modal-content {
-    border-radius: var(--radius);
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.btn-close {
-    margin: 0;
-}
-
-/* اصلاح استایل دکمه‌ها در کنار هم */
-.view-options {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.filters {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: nowrap;
-}
-
-@media (max-width: 768px) {
-    .filters {
-        flex-wrap: wrap;
-    }
-    
-    .filters > * {
-        width: 100%;
-    }
-}
-/* کانتینر اصلی */
-.categories-container {
-    padding: 2rem;
-    margin-right: 260px; /* برای sidebar */
-}
-
-/* هدر صفحه */
-.categories-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.page-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--dark-color);
-}
-
-/* آمار دسته‌بندی‌ها */
-.categories-stats {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.stat-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.stat-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
-.stat-item i {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-}
-
-/* نوار فیلتر */
-.filter-bar {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-}
-
-.search-box {
-    flex: 1;
-    position: relative;
-}
-
-.search-box input {
-    width: 100%;
-    padding: 0.5rem 2.5rem 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    transition: var(--transition);
-}
-
-.search-box i {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--secondary-color);
-}
-
-.filters {
-    display: flex;
-    gap: 1rem;
-}
-
-/* گرید دسته‌بندی‌ها */
-.categories-grid {
+/* Stats Cards */
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-.categories-grid.list {
-    grid-template-columns: 1fr;
-}
-
-.categories-grid.tree {
-    display: block;
-}
-
-/* کارت دسته‌بندی */
-.category-card {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    padding: 1.5rem;
-    transition: var(--transition);
-}
-
-.category-card:hover {
-    box-shadow: var(--shadow);
-}
-
-.category-header {
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    transition: transform 0.2s;
 }
 
-.category-icon {
-    width: 48px;
-    height: 48px;
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--light-color);
-    border-radius: 50%;
+    margin-left: 15px;
+    font-size: 24px;
+    color: white;
 }
 
-.category-icon i {
-    font-size: 1.5rem;
-    color: var(--primary-color);
+.stat-icon.total { background: #4CAF50; }
+.stat-icon.active { background: #2196F3; }
+.stat-icon.parent { background: #9C27B0; }
+.stat-icon.child { background: #FF9800; }
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
 }
 
-.category-info {
-    flex: 1;
+.stat-info p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 14px;
 }
 
-.category-name {
-    font-size: 1.25rem;
-    margin: 0 0 0.25rem;
+/* Category Tree */
+.category-tree {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
-.parent-category {
-    font-size: 0.875rem;
-    color: var(--secondary-color);
-}
-
-.category-stats {
+.tree-header {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.category-stats span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--secondary-color);
+.tree-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
 }
 
 .category-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 10px;
 }
 
-.btn-icon {
-    width: 36px;
-    height: 36px;
+/* Tree View */
+.tree-view {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.tree-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    border: none;
-    background: var(--light-color);
-    border-radius: var(--radius);
-    color: var(--secondary-color);
-    transition: var(--transition);
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background 0.2s;
 }
 
-.btn-icon:hover {
-    background: var(--primary-color);
-    color: white;
+.tree-item:hover {
+    background: #f5f5f5;
 }
 
-.category-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+.tree-item .drag-handle {
+    cursor: move;
+    color: #999;
+    margin-left: 10px;
 }
 
-.tag {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.75rem;
-    background: var(--light-color);
-    border-radius: 1rem;
-    color: var(--secondary-color);
+.tree-item .category-name {
+    flex-grow: 1;
 }
 
-.category-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    color: var(--secondary-color);
+.tree-item .category-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
 }
 
-/* Breadcrumb */
-.categories-breadcrumb {
-    margin-bottom: 2rem;
+.tree-item:hover .category-actions {
+    opacity: 1;
 }
 
-.breadcrumb {
-    display: flex;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.breadcrumb-item {
-    display: flex;
-    align-items: center;
-}
-
-.breadcrumb-item:not(:last-child)::after {
-    content: '/';
-    margin-right: 0.5rem;
-    color: var(--secondary-color);
-}
-
-.breadcrumb-item a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-/* فعالیت‌های اخیر */
-.recent-activities {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    padding: 1.5rem;
-    margin-top: 2rem;
-}
-
-.recent-activities h3 {
-    font-size: 1.25rem;
-    margin: 0 0 1rem;
-}
-
-.activities-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background: var(--light-color);
-    border-radius: var(--radius);
-}
-
-.activity-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border-radius: 50%;
-}
-
-.activity-details {
-    flex: 1;
-    font-size: 0.875rem;
-}
-
-.activity-user {
-    font-weight: 500;
-    color: var(--primary-color);
-}
-
-.activity-time {
-    font-size: 0.75rem;
-    color: var(--secondary-color);
-}
-
-/* مودال‌ها */
+/* Modal Styles */
 .modal-header {
-    border-bottom: 1px solid var(--border-color);
+    background: #f8f9fa;
+    border-bottom: none;
 }
 
 .modal-footer {
-    border-top: 1px solid var(--border-color);
+    border-top: none;
 }
 
-/* Select2 سفارشی‌سازی */
-.select2-container--default .select2-selection--multiple {
-    border-color: var(--border-color);
-    border-radius: var(--radius);
+/* Form Controls */
+.form-control:focus {
+    box-shadow: none;
+    border-color: #2196F3;
 }
 
-/* Pickr سفارشی‌سازی */
-.pickr {
-    width: 100%;
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    border: 1px solid #ced4da;
 }
 
-.pickr button {
-    width: 100%;
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px;
 }
 
-/* انیمیشن‌ها */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Filters Section */
+.filters-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.category-card {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* حالت تاریک */
-[data-theme="dark"] {
-    --dark-color: #f8f9fa;
-    --light-color: #2d3436;
-    background-color: #1a1a1a;
-}
-
-[data-theme="dark"] .category-card,
-[data-theme="dark"] .filter-bar,
-[data-theme="dark"] .recent-activities {
-    background: #2d3436;
-}
-
-[data-theme="dark"] .category-stats,
-[data-theme="dark"] .modal-header,
-[data-theme="dark"] .modal-footer {
-    border-color: #3d4246;
-}
-
-/* رسپانسیو */
+/* Responsive */
 @media (max-width: 768px) {
-    .categories-container {
+    .category-container {
         margin-right: 0;
-        padding: 1rem;
+        padding: 10px;
     }
 
-    .categories-header {
-        flex-direction: column;
-        gap: 1rem;
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .filter-bar {
-        flex-direction: column;
+    .stat-card {
+        padding: 15px;
     }
 
-    .categories-stats {
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .stat-info h3 {
+        font-size: 20px;
+    }
+
+    .category-actions {
         flex-wrap: wrap;
+    }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    .category-container {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .stat-card,
+    .category-tree,
+    .filters-section {
+        background: #2d2d2d;
+        color: #fff;
+    }
+
+    .tree-item:hover {
+        background: #3d3d3d;
+    }
+
+    .modal-content {
+        background: #2d2d2d;
+        color: #fff;
+    }
+
+    .form-control {
+        background: #3d3d3d;
+        border-color: #4d4d4d;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        background: #3d3d3d;
+        color: #fff;
     }
 }
