@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // تابع بررسی لاگین بودن کاربر
 function isLoggedIn() {
@@ -33,17 +35,20 @@ function redirectIfNotAdmin() {
         exit;
     }
 }
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 // بررسی دسترسی کاربر
 function checkPermission($permission) {
+    if (!isLoggedIn()) {
+        header('Location: login.php');
+        exit;
+    }
     return true; // فعلاً همه دسترسی‌ها رو مجاز می‌کنیم
 }
 
 // بررسی وجود دسترسی
 function hasPermission($permission) {
+    if (!isLoggedIn()) {
+        return false;
+    }
     return true; // فعلاً همه دسترسی‌ها رو مجاز می‌کنیم
 }
-
