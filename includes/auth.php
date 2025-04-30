@@ -2,7 +2,13 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+// بررسی لاگین بودن کاربر
+function checkAuth() {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ' . BASE_URL . '/login.php');
+        exit;
+    }
+}
 /**
  * بررسی لاگین بودن کاربر
  * @return bool

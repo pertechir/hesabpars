@@ -4,8 +4,22 @@ require_once '../includes/auth.php';
 require_once '../includes/functions.php';
 require_once '../includes/jdf.php';
 
+
 // بررسی دسترسی
 checkPermission('add_products');
+
+
+// بررسی لاگین بودن
+checkAuth();
+
+// بررسی دسترسی با پیام خطای مناسب
+if (!hasPermission('add_products')) {
+    $_SESSION['error'] = 'شما دسترسی لازم برای این عملیات را ندارید';
+    header('Location: ' . BASE_URL . '/pages/dashboard.php');
+    exit;
+}
+
+
 
 // دریافت لیست دسته‌بندی‌ها
 $categories = [];
@@ -111,16 +125,22 @@ $defaultValues = [
     <link rel="shortcut icon" href="../../assets/images/favicon.ico">
     
     <!-- CSS Files -->
-    <link rel="stylesheet" href="../../assets/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="../../assets/css/all.min.css">
-    <link rel="stylesheet" href="../../assets/css/select2.min.css">
-    <link rel="stylesheet" href="../../assets/css/select2-bootstrap-5-theme.rtl.min.css">
-    <link rel="stylesheet" href="../../assets/css/sweetalert2.min.css">
-    <link rel="stylesheet" href="../../assets/css/dropzone.min.css">
-    <link rel="stylesheet" href="../../assets/css/main.css">
-    <link rel="stylesheet" href="../../assets/css/products.css">
-</head>
-<body>
+    <link rel="shortcut icon" href="../assets/images/favicon.ico">
+    <!-- Bootstrap RTL -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Dropzone -->
+    <link href="https://unpkg.com/dropzone@5.9.3/dist/min/dropzone.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/products.css"></head>
+    <body>
 
     <!-- Sidebar -->
     <?php include_once '../../includes/sidebar.php'; ?>
@@ -450,14 +470,19 @@ $defaultValues = [
     </div>
 
     <!-- JS Files -->
-    <script src="../../assets/js/jquery.min.js"></script>
-    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js/select2.min.js"></script>
-    <script src="../../assets/js/select2-fa.js"></script>
-    <script src="../../assets/js/sweetalert2.min.js"></script>
-    <script src="../../assets/js/dropzone.min.js"></script>
-    <script src="../../assets/js/main.js"></script>
-    <script src="../../assets/js/products.js"></script>
-
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fa.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
+    <!-- Dropzone -->
+    <script src="https://unpkg.com/dropzone@5.9.3/dist/min/dropzone.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/products.js"></script>
 </body>
 </html>

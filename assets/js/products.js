@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Dropzone
     let imageDropzone = new Dropzone("#imageDropzone", {
-        url: "ajax/upload-product-image.php",
+        url: "../ajax/upload-product-image.php",
         paramName: "image",
         maxFilesize: 5, // MB
         maxFiles: 1,

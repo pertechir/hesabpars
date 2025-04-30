@@ -4,7 +4,7 @@ define('DB_HOST', 'localhost');
 define('DB_NAME', 'hesabpars');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-
+define('BASE_URL', '/hesabpars');
 // تنظیمات سایت
 define('SITE_NAME', 'حساب پارسه');
 define('SITE_URL', 'http://localhost/hesabpars');
