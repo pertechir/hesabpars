@@ -27,7 +27,9 @@ $stats = [
     'active' => 0,
     'inactive' => 0,
     'products' => 0,
-    'subcategories' => 0
+    'subcategories' => 0,
+    'parent' => 0,
+    'child' => 0
 ];
 
 $mainCategories = [];
@@ -41,7 +43,8 @@ try {
             SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
             SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive,
             SUM(products_count) as products,
-            (SELECT COUNT(*) FROM categories WHERE parent_id IS NOT NULL) as subcategories
+            (SELECT COUNT(*) FROM categories WHERE parent_id IS NULL) as parent,
+            (SELECT COUNT(*) FROM categories WHERE parent_id IS NOT NULL) as child
         FROM categories
     ";
     $stats = $db->query($statsQuery)->fetch(PDO::FETCH_ASSOC);
@@ -204,12 +207,6 @@ $defaultColors = [
         <!-- نوار هدر -->
         <div class="categories-header">
             <div class="header-info">
-                <h1 class="page-title">مدیریت دسته‌بندی‌ها</h1>
-                <div class="categories-stats">
-                    <span class="stat-item" title="کل دسته‌بندی‌ها">
-                        <i class="fas fa-folder"></i>
-                        <?php echo number_format($stats['total']); ?>
-                    </span>
                     <h1 class="page-title">مدیریت دسته‌بندی‌ها</h1>
                 <div class="categories-stats">
                     <span class="stat-item" title="کل دسته‌بندی‌ها">
@@ -233,3 +230,4 @@ $defaultColors = [
                         <?php echo number_format($stats['child']); ?>
                     </span>
                 </div>
+                    
