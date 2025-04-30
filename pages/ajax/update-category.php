@@ -19,27 +19,27 @@ if (!hasPermission('edit_categories')) {
 }
 
 try {
-    // دریافت و اعتبارسنجی داده‌ها
-    $categoryId = (int)$_POST['category_id'];
+    // دریافت و تمیز کردن داده‌ها
+    $categoryId = (int)($_POST['category_id'] ?? 0);
     $name = clean($_POST['name'] ?? '');
     
-    if (empty($categoryId) || empty($name)) {
+    if (!$categoryId || empty($name)) {
         throw new Exception('اطلاعات ناقص است');
     }
 
     // بررسی وجود دسته‌بندی
     $stmt = $db->prepare("SELECT * FROM categories WHERE id = ?");
     $stmt->execute([$categoryId]);
-    $category = $stmt->fetch(PDO::FETCH_ASSOC);
+    $category = $stmt->fetch();
     
     if (!$category) {
         throw new Exception('دسته‌بندی مورد نظر یافت نشد');
     }
 
     $slug = !empty($_POST['slug']) ? clean($_POST['slug']) : createSlug($name);
-    $description = clean($_POST['description'] ?? '');
     $parentId = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
-    $status = clean($_POST['status'] ?? 'active');
+    $description = clean($_POST['description'] ?? '');
+    $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
     $icon = clean($_POST['icon'] ?? '');
     $color = clean($_POST['color'] ?? '#e3f2fd');
 
@@ -50,8 +50,9 @@ try {
         throw new Exception('این نامک قبلاً استفاده شده است');
     }
 
-    // بررسی حلقه در ساختار درختی
+    // بررسی ساختار درختی
     if ($parentId) {
+        // بررسی حلقه در ساختار
         if ($parentId == $categoryId) {
             throw new Exception('دسته‌بندی نمی‌تواند زیرمجموعه خودش باشد');
         }
@@ -67,19 +68,16 @@ try {
                 throw new Exception('ساختار درختی نامعتبر است');
             }
         }
+
+        // بررسی وضعیت والد
+        $stmt = $db->prepare("SELECT status FROM categories WHERE id = ?");
+        $stmt->execute([$parentId]);
+        if ($stmt->fetchColumn() !== 'active') {
+            throw new Exception('دسته‌بندی والد غیرفعال است');
+        }
     }
 
     $db->beginTransaction();
-
-    // آپلود تصویر جدید
-    $thumbnail = $category['thumbnail'];
-    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
-        // حذف تصویر قبلی
-        if ($thumbnail) {
-            deleteImage($thumbnail, 'categories');
-        }
-        $thumbnail = uploadImage($_FILES['thumbnail'], 'categories');
-    }
 
     // بروزرسانی دسته‌بندی
     $stmt = $db->prepare("
@@ -91,8 +89,7 @@ try {
             status = :status,
             icon = :icon,
             color = :color,
-            thumbnail = :thumbnail,
-            updated_by = :user_id,
+            last_updated_by = :user_id,
             updated_at = NOW()
         WHERE id = :category_id
     ");
@@ -106,9 +103,23 @@ try {
         ':status' => $status,
         ':icon' => $icon,
         ':color' => $color,
-        ':thumbnail' => $thumbnail,
         ':user_id' => $_SESSION['user_id']
     ]);
+
+    // اگر وضعیت به غیرفعال تغییر کرده، زیرمجموعه‌ها هم غیرفعال شوند
+    if ($status === 'inactive' && $category['status'] === 'active') {
+        $stmt = $db->prepare("
+            UPDATE categories 
+            SET status = 'inactive',
+                last_updated_by = :user_id,
+                updated_at = NOW()
+            WHERE parent_id = :category_id
+        ");
+        $stmt->execute([
+            ':category_id' => $categoryId,
+            ':user_id' => $_SESSION['user_id']
+        ]);
+    }
 
     // ثبت فعالیت
     logActivity('categories', $categoryId, 'update', 'ویرایش دسته‌بندی: ' . $name);

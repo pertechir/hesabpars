@@ -7,136 +7,75 @@ require_once '../includes/jdf.php';
 // بررسی دسترسی کاربر
 checkPermission('view_categories');
 
-// دریافت آمار دسته‌بندی‌ها
+// تنظیم عنوان صفحه
+$pageTitle = 'مدیریت دسته‌بندی‌ها';
+
 try {
-    global $db;
-    
-    // آمار کلی دسته‌بندی‌ها
-    $stmt = $db->query("SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-        SUM(CASE WHEN parent_id IS NULL THEN 1 ELSE 0 END) as parents,
-        SUM(CASE WHEN parent_id IS NOT NULL THEN 1 ELSE 0 END) as children
-    FROM categories");
-    $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+    // دریافت آمار دسته‌بندی‌ها
+    $statsQuery = $db->query("
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+            SUM(CASE WHEN parent_id IS NULL THEN 1 ELSE 0 END) as parents,
+            SUM(CASE WHEN parent_id IS NOT NULL THEN 1 ELSE 0 END) as children
+        FROM categories
+    ");
+    $stats = $statsQuery->fetch(PDO::FETCH_ASSOC);
 
-    // دریافت لیست دسته‌بندی‌ها به صورت درختی
-    function getCategoryTree($db, $parentId = null, $level = 0) {
-        $stmt = $db->prepare("
-            SELECT c.*, 
-                   COUNT(p.id) as product_count,
-                   u.full_name as created_by_name,
-                   (SELECT COUNT(*) FROM categories WHERE parent_id = c.id) as children_count
-            FROM categories c
-            LEFT JOIN products p ON p.category_id = c.id
-            LEFT JOIN users u ON c.created_by = u.id
-            WHERE c.parent_id " . ($parentId === null ? "IS NULL" : "= ?") . "
-            GROUP BY c.id
-            ORDER BY c.position ASC, c.name ASC
-        ");
-        
-        if ($parentId === null) {
-            $stmt->execute();
-        } else {
-            $stmt->execute([$parentId]);
-        }
-        
-        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $html = '';
-        
-        foreach ($categories as $category) {
-            $statusClass = $category['status'] === 'active' ? 'status-active' : 'status-inactive';
-            $statusText = $category['status'] === 'active' ? 'فعال' : 'غیرفعال';
-            $hasChildren = $category['children_count'] > 0;
-            
-            $html .= '<div class="tree-item" data-id="' . $category['id'] . '" data-status="' . $category['status'] . '">';
-            $html .= str_repeat('<div class="tree-indent"></div>', $level);
-            
-            $html .= '<div class="tree-item-content">';
-            if ($hasChildren) {
-                $html .= '<div class="tree-toggle"><i class="fas fa-caret-down"></i></div>';
-            }
-            $html .= '<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>';
-            
-            // آیکون دسته‌بندی با رنگ سفارشی
-            $iconBackground = $category['color'] ?: '#e3f2fd';
-            $html .= '<div class="category-icon" style="background: ' . $iconBackground . '">';
-            $html .= '<i class="' . ($category['icon'] ?: 'fas fa-folder') . '"></i>';
-            $html .= '</div>';
-            
-            $html .= '<div class="category-info">';
-            $html .= '<div class="category-name">' . htmlspecialchars($category['name']) . '</div>';
-            $html .= '<div class="category-meta">';
-            $html .= '<span class="meta-item"><i class="fas fa-box"></i> ' . $category['product_count'] . ' محصول</span>';
-            $html .= '<span class="meta-item"><span class="status-badge ' . $statusClass . '">' . $statusText . '</span></span>';
-            $html .= '<span class="meta-item"><i class="fas fa-clock"></i> ' . jdate('Y/m/d', strtotime($category['created_at'])) . '</span>';
-            $html .= '</div></div>';
-            
-            $html .= '<div class="category-actions">';
-            if (hasPermission('edit_categories')) {
-                $html .= '<button type="button" class="btn btn-sm btn-outline-secondary edit-category" data-id="' . $category['id'] . '">';
-                $html .= '<i class="fas fa-edit"></i></button>';
-            }
-            if (hasPermission('delete_categories')) {
-                $html .= '<button type="button" class="btn btn-sm btn-outline-danger delete-category" data-id="' . $category['id'] . '" ';
-                $html .= 'data-name="' . htmlspecialchars($category['name']) . '"><i class="fas fa-trash-alt"></i></button>';
-            }
-            $html .= '</div></div>';
-
-            // بازگشت فراخوانی برای زیردسته‌ها
-            if ($hasChildren) {
-                $html .= '<div class="tree-children">';
-                $html .= getCategoryTree($db, $category['id'], $level + 1);
-                $html .= '</div>';
-            }
-            
-            $html .= '</div>';
-        }
-        
-        return $html;
-    }
-
-    $categoryTree = getCategoryTree($db);
+    // دریافت لیست دسته‌بندی‌ها
+    $categoriesQuery = $db->query("
+        SELECT c.*, 
+               COALESCE(p.product_count, 0) as product_count,
+               u.full_name as created_by_name,
+               (SELECT COUNT(*) FROM categories WHERE parent_id = c.id) as children_count
+        FROM categories c
+        LEFT JOIN (
+            SELECT category_id, COUNT(*) as product_count 
+            FROM products 
+            GROUP BY category_id
+        ) p ON p.category_id = c.id
+        LEFT JOIN users u ON c.created_by = u.id
+        WHERE c.parent_id IS NULL
+        ORDER BY c.sort_order ASC, c.name ASC
+    ");
+    $categories = $categoriesQuery->fetchAll(PDO::FETCH_ASSOC);
 
 } catch(PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    createAlert('error', 'خطا در دریافت اطلاعات از دیتابیس');
+    error_log("Database Error in categories.php: " . $e->getMessage());
+    createAlert('error', 'خطا در دریافت اطلاعات');
     $stats = [
         'total' => 0,
         'active' => 0,
         'parents' => 0,
         'children' => 0
     ];
-    $categoryTree = '';
+    $categories = [];
 }
 
-// دریافت لیست دسته‌بندی‌ها برای select
+// دریافت دسته‌بندی‌های والد برای select
 function getCategoryOptions($db, $excludeId = null) {
     try {
         $sql = "SELECT id, name, parent_id FROM categories WHERE status = 'active'";
         if ($excludeId) {
-            $sql .= " AND id != ?";
+            $sql .= " AND id != ? AND parent_id != ?";
         }
         $sql .= " ORDER BY name ASC";
         
         $stmt = $db->prepare($sql);
         if ($excludeId) {
-            $stmt->execute([$excludeId]);
+            $stmt->execute([$excludeId, $excludeId]);
         } else {
             $stmt->execute();
         }
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
-        error_log("Database Error: " . $e->getMessage());
+        error_log("Error in getCategoryOptions: " . $e->getMessage());
         return [];
     }
 }
 
-$categories = getCategoryOptions($db);
-
-// تنظیم عنوان صفحه
-$pageTitle = 'مدیریت دسته‌بندی‌ها';
+$parentCategories = getCategoryOptions($db);
 ?>
 
 <!DOCTYPE html>
@@ -227,7 +166,7 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                 </div>
                 <div class="tree-actions">
                     <div class="tree-search">
-                        <input type="text" id="categorySearch" placeholder="جستجو در دسته‌بندی‌ها...">
+                        <input type="text" id="categorySearch" class="form-control" placeholder="جستجو در دسته‌بندی‌ها...">
                         <i class="fas fa-search"></i>
                     </div>
                     <?php if (hasPermission('bulk_edit_categories')): ?>
@@ -250,7 +189,89 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
             </div>
 
             <div class="tree-view">
-                <?php echo $categoryTree; ?>
+                <?php
+                function renderCategoryTree($categories, $level = 0) {
+                    $html = '';
+                    foreach ($categories as $category) {
+                        $statusClass = $category['status'] === 'active' ? 'status-active' : 'status-inactive';
+                        $statusText = $category['status'] === 'active' ? 'فعال' : 'غیرفعال';
+                        
+                        $html .= '<div class="tree-item" data-id="' . $category['id'] . '" data-status="' . $category['status'] . '">';
+                        $html .= str_repeat('<div class="tree-indent"></div>', $level);
+                        
+                        $html .= '<div class="tree-item-content">';
+                        if ($category['children_count'] > 0) {
+                            $html .= '<div class="tree-toggle"><i class="fas fa-caret-down"></i></div>';
+                        }
+                        $html .= '<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>';
+                        
+                        // آیکون با رنگ سفارشی
+                        $iconBackground = $category['color'] ?: '#e3f2fd';
+                        $html .= '<div class="category-icon" style="background: ' . $iconBackground . '">';
+                        $html .= '<i class="' . ($category['icon'] ?: 'fas fa-folder') . '"></i>';
+                        $html .= '</div>';
+                        
+                        $html .= '<div class="category-info">';
+                        $html .= '<div class="category-name">' . htmlspecialchars($category['name']) . '</div>';
+                        $html .= '<div class="category-meta">';
+                        $html .= '<span class="meta-item"><i class="fas fa-box"></i> ' . $category['product_count'] . ' محصول</span>';
+                        $html .= '<span class="meta-item"><span class="status-badge ' . $statusClass . '">' . $statusText . '</span></span>';
+                        $html .= '<span class="meta-item"><i class="fas fa-clock"></i> ' . jdate('Y/m/d', strtotime($category['created_at'])) . '</span>';
+                        $html .= '</div></div>';
+                        
+                        $html .= '<div class="category-actions">';
+                        if (hasPermission('edit_categories')) {
+                            $html .= '<button type="button" class="btn btn-sm btn-outline-secondary edit-category" ';
+                            $html .= 'data-id="' . $category['id'] . '" ';
+                            $html .= 'data-name="' . htmlspecialchars($category['name']) . '" ';
+                            $html .= 'data-description="' . htmlspecialchars($category['description']) . '" ';
+                            $html .= 'data-parent="' . ($category['parent_id'] ?: '') . '" ';
+                            $html .= 'data-status="' . $category['status'] . '" ';
+                            $html .= 'data-icon="' . ($category['icon'] ?: '') . '" ';
+                            $html .= 'data-color="' . ($category['color'] ?: '') . '">';
+                            $html .= '<i class="fas fa-edit"></i></button>';
+                        }
+                        if (hasPermission('delete_categories')) {
+                            $html .= '<button type="button" class="btn btn-sm btn-outline-danger delete-category" ';
+                            $html .= 'data-id="' . $category['id'] . '" ';
+                            $html .= 'data-name="' . htmlspecialchars($category['name']) . '">';
+                            $html .= '<i class="fas fa-trash-alt"></i></button>';
+                        }
+                        $html .= '</div></div>';
+                        
+                        // بازگشت فراخوانی برای زیردسته‌ها
+                        if ($category['children_count'] > 0) {
+                            global $db;
+                            $stmt = $db->prepare("
+                                SELECT c.*, 
+                                       COALESCE(p.product_count, 0) as product_count,
+                                       u.full_name as created_by_name,
+                                       (SELECT COUNT(*) FROM categories WHERE parent_id = c.id) as children_count
+                                FROM categories c
+                                LEFT JOIN (
+                                    SELECT category_id, COUNT(*) as product_count 
+                                    FROM products 
+                                    GROUP BY category_id
+                                ) p ON p.category_id = c.id
+                                LEFT JOIN users u ON c.created_by = u.id
+                                WHERE c.parent_id = ?
+                                ORDER BY c.sort_order ASC, c.name ASC
+                            ");
+                            $stmt->execute([$category['id']]);
+                            $children = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            
+                            $html .= '<div class="tree-children">';
+                            $html .= renderCategoryTree($children, $level + 1);
+                            $html .= '</div>';
+                        }
+                        
+                        $html .= '</div>';
+                    }
+                    return $html;
+                }
+                
+                echo renderCategoryTree($categories);
+                ?>
             </div>
         </div>
     </div>
@@ -263,7 +284,7 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                     <h5 class="modal-title">افزودن دسته‌بندی جدید</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="addCategoryForm">
+                <form id="addCategoryForm" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -278,7 +299,7 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                                 <label class="form-label">دسته‌بندی والد</label>
                                 <select class="form-select select2" name="parent_id">
                                     <option value="">دسته‌بندی اصلی</option>
-                                    <?php foreach ($categories as $category): ?>
+                                    <?php foreach ($parentCategories as $category): ?>
                                     <option value="<?php echo $category['id']; ?>">
                                         <?php echo htmlspecialchars($category['name']); ?>
                                     </option>
@@ -304,10 +325,6 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                                 <label class="form-label">رنگ</label>
                                 <input type="color" class="form-control form-control-color w-100" name="color" value="#e3f2fd">
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">تصویر شاخص</label>
-                                <input type="file" class="form-control" name="thumbnail" accept="image/*">
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -330,7 +347,7 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                     <h5 class="modal-title">ویرایش دسته‌بندی</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="editCategoryForm">
+                <form id="editCategoryForm" enctype="multipart/form-data">
                     <input type="hidden" name="category_id" id="editCategoryId">
                     <div class="modal-body">
                         <div class="row g-3">
@@ -346,7 +363,7 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                                 <label class="form-label">دسته‌بندی والد</label>
                                 <select class="form-select select2" name="parent_id" id="editCategoryParent">
                                     <option value="">دسته‌بندی اصلی</option>
-                                    <?php foreach ($categories as $category): ?>
+                                    <?php foreach ($parentCategories as $category): ?>
                                     <option value="<?php echo $category['id']; ?>">
                                         <?php echo htmlspecialchars($category['name']); ?>
                                     </option>
@@ -371,13 +388,6 @@ $pageTitle = 'مدیریت دسته‌بندی‌ها';
                             <div class="col-md-6">
                                 <label class="form-label">رنگ</label>
                                 <input type="color" class="form-control form-control-color w-100" name="color" id="editCategoryColor">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">تصویر شاخص جدید</label>
-                                <input type="file" class="form-control" name="thumbnail" accept="image/*">
-                            </div>
-                            <div class="col-12" id="currentThumbnail">
-                                <!-- نمایش تصویر فعلی -->
                             </div>
                         </div>
                     </div>

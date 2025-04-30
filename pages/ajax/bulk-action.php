@@ -34,17 +34,30 @@ try {
         case 'deactivate':
             $status = $action === 'activate' ? 'active' : 'inactive';
             
+            // بروزرسانی وضعیت دسته‌بندی‌های انتخاب شده
             $placeholders = str_repeat('?,', count($items) - 1) . '?';
             $stmt = $db->prepare("
                 UPDATE categories 
                 SET status = ?, 
-                    updated_by = ?,
+                    last_updated_by = ?,
                     updated_at = NOW()
                 WHERE id IN ($placeholders)
             ");
             
             $params = array_merge([$status, $_SESSION['user_id']], $items);
             $stmt->execute($params);
+
+            // اگر غیرفعال‌سازی است، زیردسته‌ها هم غیرفعال شوند
+            if ($status === 'inactive') {
+                $stmt = $db->prepare("
+                    UPDATE categories 
+                    SET status = 'inactive',
+                        last_updated_by = ?,
+                        updated_at = NOW()
+                    WHERE parent_id IN ($placeholders)
+                ");
+                $stmt->execute($params);
+            }
 
             // ثبت فعالیت
             logActivity('categories', 0, 'bulk_' . $action, 'تغییر گروهی وضعیت دسته‌بندی‌ها به: ' . $status);
@@ -76,14 +89,9 @@ try {
                 throw new Exception('برخی از دسته‌بندی‌های انتخاب شده دارای محصولات مرتبط هستند');
             }
 
-            // حذف تصاویر
-            $stmt = $db->prepare("SELECT thumbnail FROM categories WHERE id IN ($placeholders)");
+            // حذف تگ‌های مرتبط
+            $stmt = $db->prepare("DELETE FROM category_tags WHERE category_id IN ($placeholders)");
             $stmt->execute($items);
-            while ($category = $stmt->fetch()) {
-                if ($category['thumbnail']) {
-                    deleteImage($category['thumbnail'], 'categories');
-                }
-            }
 
             // حذف دسته‌بندی‌ها
             $stmt = $db->prepare("DELETE FROM categories WHERE id IN ($placeholders)");

@@ -27,9 +27,9 @@ try {
     }
 
     // بررسی وجود دسته‌بندی
-    $stmt = $db->prepare("SELECT name, thumbnail FROM categories WHERE id = ?");
+    $stmt = $db->prepare("SELECT name FROM categories WHERE id = ?");
     $stmt->execute([$categoryId]);
-    $category = $stmt->fetch(PDO::FETCH_ASSOC);
+    $category = $stmt->fetch();
     
     if (!$category) {
         throw new Exception('دسته‌بندی مورد نظر یافت نشد');
@@ -51,10 +51,9 @@ try {
 
     $db->beginTransaction();
 
-    // حذف تصویر دسته‌بندی
-    if ($category['thumbnail']) {
-        deleteImage($category['thumbnail'], 'categories');
-    }
+    // حذف تگ‌های دسته‌بندی
+    $stmt = $db->prepare("DELETE FROM category_tags WHERE category_id = ?");
+    $stmt->execute([$categoryId]);
 
     // حذف دسته‌بندی
     $stmt = $db->prepare("DELETE FROM categories WHERE id = ?");

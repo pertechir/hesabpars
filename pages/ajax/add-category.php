@@ -3,6 +3,13 @@ require_once '../../includes/config.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/functions.php';
 
+
+error_log("Received POST data: " . print_r($_POST, true));
+if (!empty($_FILES)) {
+    error_log("Received FILES data: " . print_r($_FILES, true));
+}
+
+
 // بررسی درخواست Ajax
 if (!isAjaxRequest()) {
     http_response_code(400);
@@ -19,16 +26,16 @@ if (!hasPermission('add_categories')) {
 }
 
 try {
-    // دریافت و اعتبارسنجی داده‌ها
+    // دریافت و تمیز کردن داده‌ها
     $name = clean($_POST['name'] ?? '');
     if (empty($name)) {
         throw new Exception('نام دسته‌بندی الزامی است');
     }
 
     $slug = !empty($_POST['slug']) ? clean($_POST['slug']) : createSlug($name);
-    $description = clean($_POST['description'] ?? '');
     $parentId = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
-    $status = clean($_POST['status'] ?? 'active');
+    $description = clean($_POST['description'] ?? '');
+    $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
     $icon = clean($_POST['icon'] ?? '');
     $color = clean($_POST['color'] ?? '#e3f2fd');
 
@@ -39,40 +46,38 @@ try {
         throw new Exception('این نامک قبلاً استفاده شده است');
     }
 
-    // بررسی وجود دسته‌بندی والد
+    // بررسی والد
     if ($parentId) {
-        $stmt = $db->prepare("SELECT id FROM categories WHERE id = ?");
+        $stmt = $db->prepare("SELECT id, status FROM categories WHERE id = ?");
         $stmt->execute([$parentId]);
-        if (!$stmt->fetch()) {
+        $parent = $stmt->fetch();
+        if (!$parent) {
             throw new Exception('دسته‌بندی والد نامعتبر است');
+        }
+        if ($parent['status'] !== 'active') {
+            throw new Exception('دسته‌بندی والد غیرفعال است');
         }
     }
 
-    // آپلود تصویر
-    $thumbnail = '';
-    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
-        $thumbnail = uploadImage($_FILES['thumbnail'], 'categories');
-    }
-
     // تعیین موقعیت جدید
-    $stmt = $db->prepare("SELECT COALESCE(MAX(position), 0) + 1 FROM categories WHERE parent_id " . ($parentId ? "= ?" : "IS NULL"));
+    $stmt = $db->prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM categories WHERE parent_id " . ($parentId ? "= ?" : "IS NULL"));
     if ($parentId) {
         $stmt->execute([$parentId]);
     } else {
         $stmt->execute();
     }
-    $position = $stmt->fetchColumn();
+    $sortOrder = $stmt->fetchColumn();
 
     $db->beginTransaction();
 
     // درج دسته‌بندی
     $stmt = $db->prepare("
         INSERT INTO categories (
-            name, slug, description, parent_id, status, icon, color, 
-            thumbnail, position, created_by, created_at
+            name, slug, description, parent_id, status,
+            icon, color, sort_order, created_by, created_at
         ) VALUES (
-            :name, :slug, :description, :parent_id, :status, :icon, :color,
-            :thumbnail, :position, :user_id, NOW()
+            :name, :slug, :description, :parent_id, :status,
+            :icon, :color, :sort_order, :user_id, NOW()
         )
     ");
 
@@ -84,8 +89,7 @@ try {
         ':status' => $status,
         ':icon' => $icon,
         ':color' => $color,
-        ':thumbnail' => $thumbnail,
-        ':position' => $position,
+        ':sort_order' => $sortOrder,
         ':user_id' => $_SESSION['user_id']
     ]);
 

@@ -2,27 +2,44 @@
 require_once '../../includes/config.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/functions.php';
+require_once '../../includes/jdf.php';
+
+
+error_log("Received POST data: " . print_r($_POST, true));
+if (!empty($_FILES)) {
+    error_log("Received FILES data: " . print_r($_FILES, true));
+}
+
+// برای نمایش خطاها در حالت دیباگ
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
 
 // بررسی درخواست Ajax
 if (!isAjaxRequest()) {
     http_response_code(400);
-    exit('درخواست نامعتبر');
+    exit(json_encode([
+        'success' => false,
+        'message' => 'درخواست نامعتبر'
+    ]));
 }
 
 try {
     // تابع بازگشتی برای ساخت درخت دسته‌بندی‌ها
     function buildCategoryTree($db, $parentId = null, $level = 0) {
         $stmt = $db->prepare("
-            SELECT c.*,
-                   COUNT(p.id) as product_count,
+            SELECT c.*, 
+                   COALESCE(p.product_count, 0) as product_count,
                    u.full_name as created_by_name,
                    (SELECT COUNT(*) FROM categories WHERE parent_id = c.id) as children_count
             FROM categories c
-            LEFT JOIN products p ON p.category_id = c.id
+            LEFT JOIN (
+                SELECT category_id, COUNT(*) as product_count 
+                FROM products 
+                GROUP BY category_id
+            ) p ON p.category_id = c.id
             LEFT JOIN users u ON c.created_by = u.id
             WHERE c.parent_id " . ($parentId === null ? "IS NULL" : "= ?") . "
-            GROUP BY c.id
-            ORDER BY c.position ASC, c.name ASC
+            ORDER BY c.sort_order ASC, c.name ASC
         ");
 
         if ($parentId === null) {
@@ -64,12 +81,22 @@ try {
 
             $html .= '<div class="category-actions">';
             if (hasPermission('edit_categories')) {
-                $html .= '<button type="button" class="btn btn-sm btn-outline-secondary edit-category" data-id="' . $category['id'] . '">';
+                $html .= '<button type="button" class="btn btn-sm btn-outline-secondary edit-category" ';
+                $html .= 'data-id="' . $category['id'] . '" ';
+                $html .= 'data-name="' . htmlspecialchars($category['name']) . '" ';
+                $html .= 'data-slug="' . htmlspecialchars($category['slug']) . '" ';
+                $html .= 'data-description="' . htmlspecialchars($category['description']) . '" ';
+                $html .= 'data-parent="' . ($category['parent_id'] ?: '') . '" ';
+                $html .= 'data-status="' . $category['status'] . '" ';
+                $html .= 'data-icon="' . ($category['icon'] ?: '') . '" ';
+                $html .= 'data-color="' . ($category['color'] ?: '') . '">';
                 $html .= '<i class="fas fa-edit"></i></button>';
             }
             if (hasPermission('delete_categories')) {
-                $html .= '<button type="button" class="btn btn-sm btn-outline-danger delete-category" data-id="' . $category['id'] . '" ';
-                $html .= 'data-name="' . htmlspecialchars($category['name']) . '"><i class="fas fa-trash-alt"></i></button>';
+                $html .= '<button type="button" class="btn btn-sm btn-outline-danger delete-category" ';
+                $html .= 'data-id="' . $category['id'] . '" ';
+                $html .= 'data-name="' . htmlspecialchars($category['name']) . '">';
+                $html .= '<i class="fas fa-trash-alt"></i></button>';
             }
             $html .= '</div></div>';
 
@@ -86,8 +113,11 @@ try {
         return $html;
     }
 
+    // ساخت درخت دسته‌بندی‌ها
     $categoryTree = buildCategoryTree($db);
 
+    // ارسال پاسخ
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
         'html' => $categoryTree
@@ -96,8 +126,9 @@ try {
 } catch (Exception $e) {
     error_log("Error in get-categories.php: " . $e->getMessage());
     
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
-        'message' => 'خطا در دریافت لیست دسته‌بندی‌ها'
+        'message' => 'خطا در دریافت لیست دسته‌بندی‌ها: ' . $e->getMessage()
     ]);
 }
