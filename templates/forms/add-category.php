@@ -64,4 +64,127 @@
                 <input type="radio" class="form-check-input" name="status" value="active" checked>
                 <label class="form-check-label">فعال</label>
             </div>
-            <div class="form-check form-check-
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="status" value="inactive">
+                <label class="form-check-label">غیرفعال</label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <label class="form-label">ترتیب نمایش</label>
+            <input type="number" class="form-control" name="sort_order" value="0">
+            <div class="form-text">
+                عدد بزرگتر در اولویت نمایش بالاتر قرار می‌گیرد
+            </div>
+        </div>
+        <div class="col-12">
+            <label class="form-label">برچسب‌ها</label>
+            <select class="form-select select2-tags" name="tags[]" multiple>
+                <?php foreach ($tags as $tag): ?>
+                <option value="<?php echo $tag['id']; ?>">
+                    <?php echo htmlspecialchars($tag['name']); ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+            <div class="form-text">
+                برای افزودن برچسب جدید، متن را تایپ کرده و Enter بزنید
+            </div>
+        </div>
+    </div>
+    <div class="mt-4 text-end">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            ذخیره دسته‌بندی
+        </button>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تنظیمات Select2
+    $('.select2').select2({
+        dir: 'rtl',
+        language: 'fa',
+        placeholder: 'انتخاب کنید...',
+        allowClear: true
+    });
+
+    // تنظیمات Select2 برای برچسب‌ها
+    $('.select2-tags').select2({
+        dir: 'rtl',
+        language: 'fa',
+        placeholder: 'برچسب‌ها را انتخاب یا وارد کنید...',
+        tags: true,
+        tokenSeparators: [',', ' '],
+        createTag: function(params) {
+            return {
+                id: params.term,
+                text: params.term,
+                newTag: true
+            };
+        }
+    });
+
+    // تنظیمات Pickr برای انتخاب رنگ
+    const pickr = Pickr.create({
+        el: '.color-picker',
+        theme: 'classic',
+        default: '#2196F3',
+        swatches: [
+            '#2196F3', '#4CAF50', '#FFC107', '#9C27B0',
+            '#F44336', '#FF9800', '#795548', '#607D8B'
+        ],
+        components: {
+            preview: true,
+            opacity: true,
+            hue: true,
+            interaction: {
+                hex: true,
+                rgba: true,
+                input: true,
+                clear: true,
+                save: true
+            }
+        }
+    });
+
+    // ذخیره رنگ انتخاب شده
+    pickr.on('save', (color) => {
+        document.querySelector('.color-picker').value = color.toHEXA().toString();
+        pickr.hide();
+    });
+
+    // اعتبارسنجی فرم
+    const form = document.getElementById('addCategoryForm');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // تنظیم خودکار Slug
+    const nameInput = form.querySelector('[name="name"]');
+    const slugInput = form.querySelector('[name="slug"]');
+    
+    nameInput.addEventListener('input', function() {
+        if (!slugInput.value) {
+            slugInput.value = createSlug(this.value);
+        }
+    });
+
+    function createSlug(str) {
+        return str
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/[\u0600-\u06FF]/g, '') // حذف حروف فارسی
+            .replace(/\s+/g, '-') // تبدیل فاصله به خط تیره
+            .replace(/[^\w\-]+/g, '') // حذف کاراکترهای غیرمجاز
+            .replace(/\-\-+/g, '-') // حذف خط تیره‌های تکراری
+            .replace(/^-+/, '') // حذف خط تیره از ابتدا
+            .replace(/-+$/, ''); // حذف خط تیره از انتها
+    }
+});
+</script>
