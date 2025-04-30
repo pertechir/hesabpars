@@ -1,121 +1,4 @@
-// اضافه کردن در ابتدای فایل
-$(document).ready(function() {
-    // اطمینان از وجود jQuery
-    if (typeof jQuery === 'undefined') {
-        console.error('jQuery is not loaded');
-        return;
-    }
-
-    // اطمینان از وجود Bootstrap
-    if (typeof bootstrap === 'undefined') {
-        console.error('Bootstrap is not loaded');
-        return;
-    }
-
-    // اطمینان از وجود Select2
-    if (typeof $.fn.select2 === 'undefined') {
-        console.error('Select2 is not loaded');
-        return;
-    }
-
-    // ایجاد یک نمونه از مودال‌ها
-    const addCategoryModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
-    const editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-
-    // اصلاح رویداد افزودن دسته‌بندی
-    $('.btn[data-bs-target="#addCategoryModal"]').on('click', function() {
-        addCategoryModal.show();
-    });
-
-    // اصلاح تابع editCategory
-    window.editCategory = function(id) {
-        // نمایش loading
-        Swal.fire({
-            title: 'لطفاً صبر کنید...',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        fetch(`api/categories/${id}`)
-            .then(response => response.json())
-            .then(category => {
-                Swal.close();
-                
-                Object.keys(category).forEach(key => {
-                    const input = document.getElementById(`edit_${key}`);
-                    if (input) {
-                        if (input.tagName === 'SELECT' && $(input).hasClass('select2')) {
-                            $(input).val(category[key]).trigger('change');
-                        } else {
-                            input.value = category[key];
-                        }
-                    }
-                });
-                
-                editCategoryModal.show();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطا',
-                    text: 'خطا در دریافت اطلاعات دسته‌بندی'
-                });
-            });
-    };
-
-    // بهبود نمایش پیام‌های خطا
-    function showError(message) {
-        Swal.fire({
-            icon: 'error',
-            title: 'خطا',
-            text: message,
-            confirmButtonText: 'باشه'
-        });
-    }
-
-    // بهبود نمایش پیام‌های موفقیت
-    function showSuccess(message) {
-        Swal.fire({
-            icon: 'success',
-            title: 'موفقیت',
-            text: message,
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false
-        });
-    }
-
-    // اصلاح رویداد submit فرم‌ها
-    $('#addCategoryForm, #editCategoryForm').on('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const url = this.id === 'addCategoryForm' ? 'api/categories' : `api/categories/${formData.get('category_id')}`;
-        
-        fetch(url, {
-            method: this.id === 'addCategoryForm' ? 'POST' : 'PUT',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccess(data.message);
-                location.reload();
-            } else {
-                showError(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('خطا در ارسال اطلاعات');
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     // تنظیمات Select2
     $('.select2').select2({
         dir: 'rtl',
@@ -172,36 +55,61 @@ document.addEventListener('DOMContentLoaded', function () {
         show(input) {
             const modal = document.createElement('div');
             modal.className = 'icon-picker-modal';
-            modal.innerHTML = `
-                <div class="icon-picker-content">
-                    <div class="icon-picker-search">
-                        <input type="text" placeholder="جستجوی آیکون...">
-                    </div>
-                    <div class="icon-picker-grid">
-                        ${this.icons.map(icon => `
-                            <button type="button" class="icon-item" data-icon="${icon}">
-                                <i class="${icon}"></i>
-                            </button>
-                        `).join('')}
-                    </div>
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.zIndex = '9999';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            
+            const content = document.createElement('div');
+            content.className = 'icon-picker-content';
+            content.style.backgroundColor = '#fff';
+            content.style.padding = '20px';
+            content.style.borderRadius = '8px';
+            content.style.maxWidth = '400px';
+            content.style.width = '90%';
+            content.style.maxHeight = '80vh';
+            content.style.overflowY = 'auto';
+            
+            content.innerHTML = `
+                <div class="icon-picker-search mb-3">
+                    <input type="text" class="form-control" placeholder="جستجوی آیکون...">
+                </div>
+                <div class="icon-picker-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px;">
+                    ${this.icons.map(icon => `
+                        <button type="button" class="btn btn-outline-secondary icon-item" data-icon="${icon}">
+                            <i class="${icon}"></i>
+                        </button>
+                    `).join('')}
                 </div>
             `;
 
+            modal.appendChild(content);
             document.body.appendChild(modal);
 
             // رویداد انتخاب آیکون
-            modal.querySelectorAll('.icon-item').forEach(btn => {
+            content.querySelectorAll('.icon-item').forEach(btn => {
                 btn.addEventListener('click', () => {
                     input.value = btn.dataset.icon;
+                    // بروزرسانی نمایش آیکون
+                    const iconPreview = input.closest('.input-group').querySelector('i');
+                    if (iconPreview) {
+                        iconPreview.className = btn.dataset.icon;
+                    }
                     modal.remove();
                 });
             });
 
             // رویداد جستجو
-            const searchInput = modal.querySelector('input');
+            const searchInput = content.querySelector('input');
             searchInput.addEventListener('input', (e) => {
                 const value = e.target.value.toLowerCase();
-                modal.querySelectorAll('.icon-item').forEach(btn => {
+                content.querySelectorAll('.icon-item').forEach(btn => {
                     const icon = btn.dataset.icon.toLowerCase();
                     btn.style.display = icon.includes(value) ? '' : 'none';
                 });
@@ -232,100 +140,67 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // فیلترها و جستجو
-    const filterForm = document.createElement('form');
-    filterForm.id = 'filterForm';
-    
-    document.querySelectorAll('#statusFilter, #sortFilter, #orderFilter').forEach(select => {
-        select.addEventListener('change', () => filterForm.submit());
-    });
-
-    const searchInput = document.getElementById('categorySearch');
-    let searchTimeout;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => filterForm.submit(), 500);
-    });
-
-    // مدیریت نمای دسته‌بندی‌ها
-    document.querySelectorAll('.view-options button').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const view = this.dataset.view;
-            document.cookie = `category_view_mode=${view};path=/;max-age=31536000`;
-            document.querySelector('.categories-grid').className = `categories-grid ${view}`;
-            
-            document.querySelectorAll('.view-options button').forEach(b => 
-                b.classList.toggle('active', b === this)
-            );
-        });
-    });
-
-    // عملیات دسته‌بندی
-    window.editCategory = function(id) {
-        fetch(`api/categories/${id}`)
-            .then(response => response.json())
-            .then(category => {
-                Object.keys(category).forEach(key => {
-                    const input = document.getElementById(`edit_${key}`);
-                    if (input) {
-                        if (input.tagName === 'SELECT' && input.multiple) {
-                            $(input).val(category[key]).trigger('change');
-                        } else {
-                            input.value = category[key];
-                        }
-                    }
-                });
-                
-                const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-                modal.show();
-            })
-            .catch(error => showError('خطا در دریافت اطلاعات دسته‌بندی'));
-    };
-
-    window.deleteCategory = function(id) {
-        Swal.fire({
-            title: 'حذف دسته‌بندی',
-            text: 'آیا از حذف این دسته‌بندی اطمینان دارید؟',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'بله، حذف شود',
-            cancelButtonText: 'انصراف',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`api/categories/${id}`, { method: 'DELETE' })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showSuccess('دسته‌بندی با موفقیت حذف شد');
-                            location.reload();
-                        } else {
-                            showError(data.message);
-                        }
-                    })
-                    .catch(error => showError('خطا در حذف دسته‌بندی'));
+    // فرم افزودن دسته‌بندی
+    document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch('../api/categories.php', { // مسیر رو اصلاح کردیم
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                location.reload();
+            } else {
+                showError(data.message || 'خطا در ثبت دسته‌بندی');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('خطا در ارسال اطلاعات');
         });
-    };
+    });
 
-    window.addSubcategory = function(parentId) {
-        document.querySelector('[name="parent_id"]').value = parentId;
-        const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
-        modal.show();
-    };
-
-    window.viewProducts = function(categoryId) {
-        window.location.href = `products.php?category=${categoryId}`;
-    };
+    // فرم ویرایش دسته‌بندی
+document.getElementById('editCategoryForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const categoryId = formData.get('category_id');
+    
+    fetch(`../api/categories.php?id=${categoryId}`, { // مسیر رو اصلاح کردیم
+        method: 'PUT',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccess(data.message);
+            location.reload();
+        } else {
+            showError(data.message || 'خطا در ویرایش دسته‌بندی');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showError('خطا در ارسال اطلاعات');
+    });
+});
 
     // توابع کمکی
     function createSlug(str) {
         return str
+            .toString()
             .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim();
+            .trim()
+            .replace(/[\u0600-\u06FF]/g, '') // حذف حروف فارسی
+            .replace(/\s+/g, '-') // تبدیل فاصله به خط تیره
+            .replace(/[^\w\-]+/g, '') // حذف کاراکترهای غیرمجاز
+            .replace(/\-\-+/g, '-') // حذف خط تیره‌های تکراری
+            .replace(/^-+/, '') // حذف خط تیره از ابتدا
+            .replace(/-+$/, ''); // حذف خط تیره از انتها
     }
 
     function showSuccess(message) {
@@ -343,67 +218,6 @@ document.addEventListener('DOMContentLoaded', function () {
             icon: 'error',
             title: 'خطا',
             text: message
-        });
-    }
-
-    // نمایش درختی با jsTree
-    if (document.querySelector('.categories-grid.tree')) {
-        $('#categoryTree').jstree({
-            'core': {
-                'themes': {
-                    'name': 'default',
-                    'responsive': true
-                },
-                'data': {
-                    'url': 'api/categories/tree',
-                    'data': function(node) {
-                        return { 'id': node.id };
-                    }
-                }
-            },
-            'plugins': ['dnd', 'search', 'state', 'types', 'wholerow'],
-            'types': {
-                'default': {
-                    'icon': 'fas fa-folder'
-                },
-                'active': {
-                    'icon': 'fas fa-folder text-success'
-                },
-                'inactive': {
-                    'icon': 'fas fa-folder text-muted'
-                }
-            }
-        }).on('move_node.jstree', function(e, data) {
-            // به‌روزرسانی موقعیت دسته‌بندی
-            fetch('api/categories/move', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: data.node.id,
-                    parent: data.parent,
-                    position: data.position
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    showError(data.message);
-                    $('#categoryTree').jstree('refresh');
-                }
-            })
-            .catch(error => {
-                showError('خطا در جابجایی دسته‌بندی');
-                $('#categoryTree').jstree('refresh');
-            });
-        });
-
-        // جستجو در درخت
-        let treeSearchTimeout;
-        document.getElementById('categorySearch').addEventListener('input', function() {
-            clearTimeout(treeSearchTimeout);
-            treeSearchTimeout = setTimeout(() => {
-                $('#categoryTree').jstree('search', this.value);
-            }, 250);
         });
     }
 });
