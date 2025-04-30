@@ -29,28 +29,7 @@ function isAjaxRequest() {
     return false;
 }
 
-function hasPermission($permission) {
-    // اگر کاربر سوپر ادمین است
-    if ($_SESSION['user_role'] === 'super_admin') {
-        return true;
-    }
 
-    // بررسی دسترسی از دیتابیس
-    global $db;
-    try {
-        $stmt = $db->prepare("
-            SELECT 1 
-            FROM user_permissions up 
-            INNER JOIN permissions p ON p.id = up.permission_id 
-            WHERE up.user_id = ? AND p.name = ?
-        ");
-        $stmt->execute([$_SESSION['user_id'], $permission]);
-        return $stmt->rowCount() > 0;
-    } catch (PDOException $e) {
-        error_log("Error checking permission: " . $e->getMessage());
-        return false;
-    }
-}
 
 // تابع فرمت تاریخ
 function formatDate($date, $includeTime = false) {
