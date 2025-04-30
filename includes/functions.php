@@ -408,28 +408,9 @@ function createAlert($type, $message, $title = '') {
         'title' => $title ?: ucfirst($type)
     ];
 }
-/**
- * بررسی دسترسی کاربر
- * @param string $permission نام دسترسی
- * @return bool نتیجه بررسی
- */
-function hasPermission($permission) {
-    // فعلاً همه دسترسی‌ها رو true برمی‌گردونیم
-    // بعداً سیستم دسترسی‌ها پیاده‌سازی میشه
-    return true;
-}
 
-/**
- * بررسی دسترسی کاربر و نمایش خطا
- * @param string $permission نام دسترسی
- */
-function checkPermission($permission) {
-    if (!hasPermission($permission)) {
-        createAlert('error', 'شما دسترسی لازم برای این عملیات را ندارید');
-        header('Location: /dashboard.php');
-        exit;
-    }
-}
+
+
 
 // تابع نمایش پیام‌ها
 function showAlerts() {
