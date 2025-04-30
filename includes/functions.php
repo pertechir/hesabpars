@@ -323,3 +323,26 @@ function logCategoryActivity($db, $categoryId, $action, $details = '') {
         ':details' => $details
     ]);
 }
+// تابع ایجاد پیام
+function createAlert($type, $message) {
+    if (!isset($_SESSION['alerts'])) {
+        $_SESSION['alerts'] = [];
+    }
+    $_SESSION['alerts'][] = [
+        'type' => $type,
+        'message' => $message
+    ];
+}
+
+// تابع نمایش پیام‌ها
+function showAlerts() {
+    if (!empty($_SESSION['alerts'])) {
+        foreach ($_SESSION['alerts'] as $alert) {
+            echo '<div class="alert alert-' . $alert['type'] . ' alert-dismissible fade show" role="alert">
+                    ' . $alert['message'] . '
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>';
+        }
+        unset($_SESSION['alerts']);
+    }
+}
