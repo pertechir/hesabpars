@@ -1,15 +1,10 @@
 <?php
-// تنظیمات پایه
-if (!defined('BASE_URL')) {
-    define('BASE_URL', '/hesabpars');
-}
-
 // تنظیمات دیتابیس
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'hesabpars');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-
+define('BASE_URL', '/hesabpars');
 // تنظیمات سایت
 define('SITE_NAME', 'حساب پارسه');
 define('SITE_URL', 'http://localhost/hesabpars');
@@ -24,14 +19,13 @@ define('DATE_FORMAT', 'Y/m/d');
 define('TIME_FORMAT', 'H:i:s');
 
 // مسیرها
-if (!defined('BASE_PATH')) {
-    define('BASE_PATH', realpath(__DIR__ . '/..'));
-}
-define('UPLOAD_PATH', BASE_PATH . '/uploads');
-define('LOG_PATH', BASE_PATH . '/logs');
+define('UPLOAD_PATH', __DIR__ . '/../uploads');
+define('LOG_PATH', __DIR__ . '/../logs');
 
 // تنظیمات منطقه‌ای
 date_default_timezone_set('Asia/Tehran');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 // اتصال به دیتابیس
 try {
@@ -46,7 +40,19 @@ try {
         ]
     );
 } catch(PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    die("خطا در اتصال به دیتابیس");
+    die("خطا در اتصال به دیتابیس: " . $e->getMessage());
 }
 
+// توابع کمکی عمومی
+function redirect($url) {
+    header("Location: $url");
+    exit;
+}
+
+function asset($path) {
+    return SITE_URL . '/assets/' . ltrim($path, '/');
+}
+
+function url($path) {
+    return SITE_URL . '/' . ltrim($path, '/');
+}

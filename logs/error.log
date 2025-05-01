@@ -333,3 +333,8 @@
 [01-May-2025 11:38:15 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
 [01-May-2025 11:38:26 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
 [01-May-2025 11:40:06 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 57
+[01-May-2025 11:55:33 Asia/Tehran] Error [2] Constant BASE_URL already defined on line 10 in file C:\xampp\htdocs\hesabpars\includes\config.php
+[01-May-2025 11:55:33 Asia/Tehran] PHP Warning:  Constant BASE_URL already defined in C:\xampp\htdocs\hesabpars\includes\config.php on line 10
+[01-May-2025 11:55:33 Asia/Tehran] Error [2] Undefined variable $db on line 6 in file C:\xampp\htdocs\hesabpars\database\insert_defaults.php
+[01-May-2025 11:55:33 Asia/Tehran] PHP Warning:  Undefined variable $db in C:\xampp\htdocs\hesabpars\database\insert_defaults.php on line 6
+[01-May-2025 11:55:33 Asia/Tehran] Uncaught Exception: Call to a member function query() on null
