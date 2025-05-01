@@ -2,3 +2,11 @@
 [01-May-2025 03:25:51 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:38) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
 [01-May-2025 03:27:20 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:52) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
 [01-May-2025 03:27:46 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:29:00 Asia/Tehran] PHP Fatal error:  Cannot redeclare url() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:59) in C:\xampp\htdocs\hesabpars\includes\config.php on line 61
+[01-May-2025 03:29:10 Asia/Tehran] Error [2] Constant BASE_URL already defined on line 11 in file C:\xampp\htdocs\hesabpars\includes\config.php
+[01-May-2025 03:29:10 Asia/Tehran] PHP Warning:  Constant BASE_URL already defined in C:\xampp\htdocs\hesabpars\includes\config.php on line 11
+[01-May-2025 03:29:10 Asia/Tehran] Error [2] Constant BASE_PATH already defined on line 15 in file C:\xampp\htdocs\hesabpars\includes\config.php
+[01-May-2025 03:29:10 Asia/Tehran] PHP Warning:  Constant BASE_PATH already defined in C:\xampp\htdocs\hesabpars\includes\config.php on line 15
+[01-May-2025 03:29:17 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:29:32 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:40) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:31:27 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
