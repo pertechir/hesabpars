@@ -332,3 +332,4 @@
 [01-May-2025 11:38:06 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
 [01-May-2025 11:38:15 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
 [01-May-2025 11:38:26 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
+[01-May-2025 11:40:06 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 57
