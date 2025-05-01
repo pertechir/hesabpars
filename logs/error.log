@@ -317,3 +317,5 @@
 [01-May-2025 04:02:09 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 217
 [01-May-2025 04:06:03 Asia/Tehran] Error [2] Undefined array key "max_stock" on line 430 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
 [01-May-2025 04:06:03 Asia/Tehran] PHP Warning:  Undefined array key "max_stock" in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 430
+[01-May-2025 11:27:04 Asia/Tehran] Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hesabpars.currencies' doesn't exist
+[01-May-2025 11:27:13 Asia/Tehran] Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hesabpars.currencies' doesn't exist

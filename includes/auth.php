@@ -45,7 +45,13 @@ function requireLogin() {
         exit;
     }
 }
-
+// تابع ریدایرکت کاربران غیر مجاز
+function redirectIfNotLoggedIn() {
+    if (!isLoggedIn()) {
+        header('Location: ' . BASE_URL . '/login.php');
+        exit;
+    }
+}
 // تابع خروج کاربر
 function logout() {
     session_destroy();
