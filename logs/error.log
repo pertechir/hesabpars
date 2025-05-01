@@ -319,3 +319,13 @@
 [01-May-2025 04:06:03 Asia/Tehran] PHP Warning:  Undefined array key "max_stock" in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 430
 [01-May-2025 11:27:04 Asia/Tehran] Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hesabpars.currencies' doesn't exist
 [01-May-2025 11:27:13 Asia/Tehran] Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hesabpars.currencies' doesn't exist
+[01-May-2025 11:32:08 Asia/Tehran] Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hesabpars.currencies' doesn't exist
+[01-May-2025 11:32:26 Asia/Tehran] Error [2] file_get_contents(C:\xampp\htdocs\hesabpars\database/add_product_tables.sql): Failed to open stream: No such file or directory on line 6 in file C:\xampp\htdocs\hesabpars\database\add_tables.php
+[01-May-2025 11:32:26 Asia/Tehran] PHP Warning:  file_get_contents(C:\xampp\htdocs\hesabpars\database/add_product_tables.sql): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\database\add_tables.php on line 6
+[01-May-2025 11:32:26 Asia/Tehran] Uncaught Exception: PDO::exec(): Argument #1 ($statement) cannot be empty
+[01-May-2025 11:34:02 Asia/Tehran] Uncaught Exception: PDO::exec(): Argument #1 ($statement) cannot be empty
+[01-May-2025 11:34:14 Asia/Tehran] Database Error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hesabpars.currencies' doesn't exist
+[01-May-2025 11:36:25 Asia/Tehran] Error [8] session_start(): Ignoring session_start() because a session is already active on line 90 in file C:\xampp\htdocs\hesabpars\includes\init.php
+[01-May-2025 11:36:25 Asia/Tehran] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\hesabpars\includes\init.php on line 90
+[01-May-2025 11:36:41 Asia/Tehran] Error [8] session_start(): Ignoring session_start() because a session is already active on line 90 in file C:\xampp\htdocs\hesabpars\includes\init.php
+[01-May-2025 11:36:41 Asia/Tehran] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\hesabpars\includes\init.php on line 90
