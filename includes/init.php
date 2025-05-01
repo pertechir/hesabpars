@@ -67,6 +67,11 @@ function redirect($path) {
 
 
 
+// تنظیم session اگر قبلاً شروع نشده باشد
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 try {
     $db = new PDO(
         "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
@@ -78,20 +83,29 @@ try {
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
         )
     );
-    
-    // تست اتصال
-    echo "اتصال به دیتابیس برقرار شد.<br>";
-    
 } catch (PDOException $e) {
     die("خطای اتصال به دیتابیس: " . $e->getMessage());
 }
 
-// تنظیم session
-session_start();
-
-// تابع برای نمایش خطاها
+// تابع نمایش خطا
 function showError($message) {
-    echo "<div style='color: red; padding: 10px; margin: 10px; border: 1px solid red;'>";
-    echo "خطا: " . $message;
-    echo "</div>";
+    echo '<div class="alert alert-danger" role="alert">';
+    echo $message;
+    echo '</div>';
+}
+
+// تابع بررسی لاگین کاربر
+function isLoggedIn() {
+    return isset($_SESSION['user_id']);
+}
+
+// تابع دریافت اطلاعات کاربر جاری
+function getCurrentUser() {
+    global $db;
+    if (isLoggedIn()) {
+        $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        return $stmt->fetch();
+    }
+    return null;
 }

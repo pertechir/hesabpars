@@ -329,3 +329,6 @@
 [01-May-2025 11:36:25 Asia/Tehran] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\hesabpars\includes\init.php on line 90
 [01-May-2025 11:36:41 Asia/Tehran] Error [8] session_start(): Ignoring session_start() because a session is already active on line 90 in file C:\xampp\htdocs\hesabpars\includes\init.php
 [01-May-2025 11:36:41 Asia/Tehran] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\hesabpars\includes\init.php on line 90
+[01-May-2025 11:38:06 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
+[01-May-2025 11:38:15 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
+[01-May-2025 11:38:26 Asia/Tehran] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:99) in C:\xampp\htdocs\hesabpars\includes\auth.php on line 19
