@@ -1,34 +1,28 @@
 <?php
 require_once '../includes/init.php';
-require_once '../includes/check_db.php';  // Add this line
 
+// نمایش خطاها در حالت توسعه
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// بررسی لاگین بودن
-checkAuth();
-
-// بررسی دسترسی
-checkPermission('add_products');
-
-
-
-// بررسی دسترسی با پیام خطای مناسب
-if (!hasPermission('add_products')) {
-    if (isAjaxRequest()) {
-        http_response_code(403);
-        echo json_encode(['success' => false, 'message' => 'شما دسترسی لازم را ندارید']);
-        exit;
-    }
-    $_SESSION['error'] = 'شما دسترسی لازم برای این عملیات را ندارید';
-    header('Location: ' . BASE_URL . '/dashboard.php');
+// بررسی احراز هویت
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ' . BASE_URL . '/login.php');
     exit;
 }
 
+// مقادیر پیش‌فرض
+$defaultValues = [
+    'status' => 'active',
+    'tax_method' => 'exclusive',
+    'min_stock' => 0,
+    'max_stock' => 999999,
+    'weight' => 0,
+    'length' => 0,
+    'width' => 0,
+    'height' => 0
+];
 
-
-// دریافت لیست دسته‌بندی‌ها
-$categories = [];
 try {
     // دریافت لیست دسته‌بندی‌ها
     $categories = [];
@@ -52,79 +46,42 @@ try {
     ");
     $categories = $stmt->fetchAll();
 
-    // دریافت سایر داده‌های مورد نیاز
-    // ... کد قبلی ...
-
-} catch (PDOException $e) {
-    error_log('Database Error: ' . $e->getMessage());
-    die('خطا در دریافت اطلاعات. لطفا با پشتیبانی تماس بگیرید.');
-}
-
-// دریافت لیست واحدها
-$units = [];
-try {
-    $stmt = $db->query("SELECT * FROM units WHERE status = 'active' ORDER BY name");
-    $units = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching units: " . $e->getMessage());
-}
-
-// دریافت لیست انبارها
-$warehouses = [];
-try {
+    // دریافت لیست انبارها
+    $warehouses = [];
     $stmt = $db->query("SELECT * FROM warehouses WHERE status = 'active' ORDER BY name");
     $warehouses = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching warehouses: " . $e->getMessage());
-}
 
-// دریافت لیست تامین‌کنندگان
-$suppliers = [];
-try {
+    // دریافت لیست تامین‌کنندگان
+    $suppliers = [];
     $stmt = $db->query("SELECT * FROM suppliers WHERE status = 'active' ORDER BY company_name");
     $suppliers = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching suppliers: " . $e->getMessage());
-}
 
-// دریافت لیست مالیات‌ها
-$taxes = [];
-try {
+    // دریافت لیست مالیات‌ها
+    $taxes = [];
     $stmt = $db->query("SELECT * FROM taxes WHERE status = 'active' ORDER BY name");
     $taxes = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching taxes: " . $e->getMessage());
-}
 
-// دریافت لیست برندها
-$brands = [];
-try {
+    // دریافت لیست برندها
+    $brands = [];
     $stmt = $db->query("SELECT * FROM brands WHERE status = 'active' ORDER BY name");
     $brands = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching brands: " . $e->getMessage());
-}
 
-// دریافت تنظیمات محصولات
-$settings = [];
-try {
+    // دریافت تنظیمات محصولات
+    $settings = [];
     $stmt = $db->query("SELECT * FROM settings WHERE module = 'products'");
     while ($row = $stmt->fetch()) {
         $settings[$row['key']] = $row['value'];
     }
-} catch (PDOException $e) {
-    error_log("Error fetching product settings: " . $e->getMessage());
-}
 
-// تنظیم متغیرهای پیش‌فرض
-$defaultValues = [
-    'min_stock' => $settings['default_min_stock'] ?? 0,
-    'max_stock' => $settings['default_max_stock'] ?? 999999,
-    'tax_method' => $settings['default_tax_method'] ?? 'exclusive',
-    'cost_price' => 0,
-    'selling_price' => 0,
-    'status' => 'active'
-];
+    // دریافت لیست واحدها
+    $units = [];
+    $stmt = $db->query("SELECT * FROM units WHERE status = 'active' ORDER BY name");
+    $units = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    error_log("Database Error: " . $e->getMessage());
+    die('خطا در دریافت اطلاعات. لطفا با پشتیبانی تماس بگیرید.');
+}
 
 ?>
 <!DOCTYPE html>
@@ -132,361 +89,237 @@ $defaultValues = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>افزودن محصول جدید | حسابپارس</title>
+    <title>افزودن محصول جدید - <?php echo SITE_NAME; ?></title>
     
-    <!-- Base URL for assets -->
-    <base href="<?php echo url(); ?>">
-    
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="<?php echo url('assets/images/favicon.ico'); ?>">
-    
-    <!-- CSS Files -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/dropzone@5.9.3/dist/min/dropzone.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo url('assets/css/main.css'); ?>">
-    <link rel="stylesheet" href="<?php echo url('assets/css/products.css'); ?>">
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/products.css">
 </head>
 <body>
+    <?php include '../includes/sidebar.php'; ?>
 
-    <!-- Sidebar -->
-    <?php include_once '../../includes/sidebar.php'; ?>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Navbar -->
-        <?php include_once '../../includes/navbar.php'; ?>
-
-        <!-- Page Content -->
-        <div class="page-content product-add">
+    <div class="content-wrapper">
+        <div class="content-header">
             <div class="container-fluid">
-                
-                <!-- Breadcrumb -->
-                <div class="page-header">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h1 class="page-title">افزودن محصول جدید</h1>
-                            <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="../dashboard.php">داشبورد</a></li>
-                                <li class="breadcrumb-item"><a href="index.php">محصولات</a></li>
-                                <li class="breadcrumb-item active">افزودن محصول</li>
-                            </ul>
-                        </div>
-                        <div class="col-auto">
-                            <a href="index.php" class="btn btn-secondary">
-                                <i class="fas fa-arrow-right"></i>
-                                <span>بازگشت</span>
-                            </a>
-                        </div>
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">افزودن محصول جدید</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-left">
+                            <li class="breadcrumb-item"><a href="<?php echo BASE_URL; ?>/pages/dashboard.php">داشبورد</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo BASE_URL; ?>/pages/products.php">محصولات</a></li>
+                            <li class="breadcrumb-item active">افزودن محصول</li>
+                        </ol>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Product Form -->
-                <form id="addProductForm" class="product-form" novalidate>
-                    <div class="row">
-                        <!-- Basic Information -->
-                        <div class="col-lg-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">اطلاعات اصلی</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productName">نام محصول <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="productName" name="name" required>
-                                                <div class="invalid-feedback">لطفاً نام محصول را وارد کنید</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productCode">کد محصول <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" id="productCode" name="code" required>
-                                                    <button type="button" class="btn btn-secondary" id="generateCode">
-                                                        <i class="fas fa-random"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="invalid-feedback">لطفاً کد محصول را وارد کنید</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productBarcode">بارکد</label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" id="productBarcode" name="barcode">
-                                                    <button type="button" class="btn btn-secondary" id="generateBarcode">
-                                                        <i class="fas fa-barcode"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productBrand">برند</label>
-                                                <select class="form-select select2" id="productBrand" name="brand_id">
-                                                    <option value="">انتخاب برند</option>
-                                                    <?php foreach ($brands as $brand): ?>
-                                                    <option value="<?= $brand['id'] ?>"><?= htmlspecialchars($brand['name']) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productCategory">دسته‌بندی <span class="text-danger">*</span></label>
-                                                <select class="form-select select2" id="productCategory" name="category_id" required>
-                                                    <option value="">انتخاب دسته‌بندی</option>
-                                                    <?php foreach ($categories as $category): ?>
-                                                    <option value="<?= $category['id'] ?>"><?= str_repeat('—', $category['level']) . ' ' . htmlspecialchars($category['name']) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <div class="invalid-feedback">لطفاً دسته‌بندی محصول را انتخاب کنید</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productUnit">واحد <span class="text-danger">*</span></label>
-                                                <select class="form-select select2" id="productUnit" name="unit_id" required>
-                                                    <option value="">انتخاب واحد</option>
-                                                    <?php foreach ($units as $unit): ?>
-                                                    <option value="<?= $unit['id'] ?>"><?= htmlspecialchars($unit['name']) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                                <div class="invalid-feedback">لطفاً واحد محصول را انتخاب کنید</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productDescription">توضیحات</label>
-                                                <textarea class="form-control" id="productDescription" name="description" rows="4"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pricing Information -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">اطلاعات قیمت‌گذاری</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productCostPrice">قیمت خرید <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <input type="number" class="form-control" id="productCostPrice" name="cost_price" required min="0" step="1">
-                                                    <span class="input-group-text">ریال</span>
-                                                </div>
-                                                <div class="invalid-feedback">لطفاً قیمت خرید را وارد کنید</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productSellingPrice">قیمت فروش <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <input type="number" class="form-control" id="productSellingPrice" name="selling_price" required min="0" step="1">
-                                                    <span class="input-group-text">ریال</span>
-                                                </div>
-                                                <div class="invalid-feedback">لطفاً قیمت فروش را وارد کنید</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label">مالیات</label>
-                                                <div class="tax-container">
-                                                    <?php foreach ($taxes as $tax): ?>
-                                                    <div class="form-check">
-                                                        <input type="checkbox" class="form-check-input" id="tax<?= $tax['id'] ?>" name="taxes[]" value="<?= $tax['id'] ?>">
-                                                        <label class="form-check-label" for="tax<?= $tax['id'] ?>"><?= htmlspecialchars($tax['name']) ?> (<?= $tax['rate'] ?>%)</label>
-                                                    </div>
-                                                    <?php endforeach; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="taxMethod">روش محاسبه مالیات</label>
-                                                <select class="form-select" id="taxMethod" name="tax_method">
-                                                    <option value="exclusive" <?= ($defaultValues['tax_method'] == 'exclusive') ? 'selected' : '' ?>>مالیات جدا از قیمت</option>
-                                                    <option value="inclusive" <?= ($defaultValues['tax_method'] == 'inclusive') ? 'selected' : '' ?>>مالیات داخل قیمت</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stock Information -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">اطلاعات موجودی</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productMinStock">حداقل موجودی</label>
-                                                <input type="number" class="form-control" id="productMinStock" name="min_stock" value="<?= $defaultValues['min_stock'] ?>" min="0" step="1">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label" for="productMaxStock">حداکثر موجودی</label>
-                                                <input type="number" class="form-control" id="productMaxStock" name="max_stock" value="<?= $defaultValues['max_stock'] ?>" min="0" step="1">
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="form-group">
-                                                <label class="form-label">موجودی اولیه در انبارها</label>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered table-sm">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>انبار</th>
-                                                                <th>موجودی</th>
-                                                                <th>محل قفسه</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php foreach ($warehouses as $warehouse): ?>
-                                                            <tr>
-                                                                <td><?= htmlspecialchars($warehouse['name']) ?></td>
-                                                                <td>
-                                                                    <input type="number" class="form-control form-control-sm" 
-                                                                           name="stock[<?= $warehouse['id'] ?>][quantity]" value="0" min="0" step="1">
-                                                                </td>
-                                                                <td>
-                                                                    <input type="text" class="form-control form-control-sm" 
-                                                                           name="stock[<?= $warehouse['id'] ?>][location]" placeholder="مثال: A-12-3">
-                                                                </td>
-                                                            </tr>
-                                                            <?php endforeach; ?>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        <div class="content">
+            <div class="container-fluid">
+                <form id="productForm" enctype="multipart/form-data">
+                    <!-- اطلاعات اصلی محصول -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-info-circle"></i> اطلاعات اصلی محصول</h3>
                         </div>
-
-                        <!-- Sidebar -->
-                        <div class="col-lg-4">
-                            <!-- Status -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">وضعیت</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="productName" class="form-label required">نام محصول</label>
+                                    <input type="text" class="form-control" id="productName" name="name" required>
                                 </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <select class="form-select" id="productStatus" name="status">
-                                            <option value="active" <?= ($defaultValues['status'] == 'active') ? 'selected' : '' ?>>فعال</option>
-                                            <option value="inactive" <?= ($defaultValues['status'] == 'inactive') ? 'selected' : '' ?>>غیرفعال</option>
-                                            <option value="discontinued" <?= ($defaultValues['status'] == 'discontinued') ? 'selected' : '' ?>>توقف تولید</option>
-                                        </select>
-                                    </div>
-                                    <div class="mt-3">
-                                        <button type="submit" class="btn btn-primary w
-
--100">
-                                            <i class="fas fa-save"></i>
-                                            <span>ذخیره محصول</span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="productCode" class="form-label required">کد محصول</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="productCode" name="code" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="generateProductCode()">
+                                            <i class="fas fa-random"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Product Image -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">تصویر محصول</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="product-image-upload">
-                                        <div id="imageDropzone" class="dropzone">
-                                            <div class="dz-message">
-                                                <i class="fas fa-cloud-upload-alt"></i>
-                                                <span>فایل را اینجا رها کنید یا کلیک کنید</span>
-                                            </div>
-                                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="barcode" class="form-label">بارکد</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="barcode" name="barcode">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="generateBarcode()">
+                                            <i class="fas fa-barcode"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Additional Information -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">اطلاعات تکمیلی</h5>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="category" class="form-label required">دسته‌بندی</label>
+                                    <select class="form-select select2" id="category" name="category_id" required>
+                                        <option value="">انتخاب کنید</option>
+                                        <?php foreach ($categories as $category): ?>
+                                            <option value="<?php echo $category['id']; ?>">
+                                                <?php echo str_repeat('- ', $category['level']) . $category['name']; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label class="form-label" for="productWeight">وزن (گرم)</label>
-                                        <input type="number" class="form-control" id="productWeight" name="weight" min="0" step="0.01">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">ابعاد (سانتی‌متر)</label>
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <input type="number" class="form-control" name="length" placeholder="طول" min="0" step="0.1">
-                                            </div>
-                                            <div class="col-4">
-                                                <input type="number" class="form-control" name="width" placeholder="عرض" min="0" step="0.1">
-                                            </div>
-                                            <div class="col-4">
-                                                <input type="number" class="form-control" name="height" placeholder="ارتفاع" min="0" step="0.1">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="productManufacturer">سازنده</label>
-                                        <input type="text" class="form-control" id="productManufacturer" name="manufacturer">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="productModel">مدل</label>
-                                        <input type="text" class="form-control" id="productModel" name="model">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="brand" class="form-label">برند</label>
+                                    <select class="form-select select2" id="brand" name="brand_id">
+                                        <option value="">انتخاب کنید</option>
+                                        <?php foreach ($brands as $brand): ?>
+                                            <option value="<?php echo $brand['id']; ?>">
+                                                <?php echo $brand['name']; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="unit" class="form-label required">واحد</label>
+                                    <select class="form-select select2" id="unit" name="unit_id" required>
+                                        <option value="">انتخاب کنید</option>
+                                        <?php foreach ($units as $unit): ?>
+                                            <option value="<?php echo $unit['id']; ?>">
+                                                <?php echo $unit['name']; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productDescription" class="form-label">توضیحات</label>
+                            <textarea id="productDescription" name="description"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- قیمت‌گذاری و موجودی -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-dollar-sign"></i> قیمت‌گذاری و موجودی</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="costPrice" class="form-label required">قیمت خرید</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="costPrice" name="cost_price" required>
+                                        <span class="input-group-text">تومان</span>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Default Supplier -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">تامین‌کننده پیش‌فرض</h5>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="sellingPrice" class="form-label required">قیمت فروش</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="sellingPrice" name="selling_price" required>
+                                        <span class="input-group-text">تومان</span>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <select class="form-select select2" id="productSupplier" name="default_supplier_id">
-                                            <option value="">انتخاب تامین‌کننده</option>
-                                            <?php foreach ($suppliers as $supplier): ?>
-                                            <option value="<?= $supplier['id'] ?>"><?= htmlspecialchars($supplier['company_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="taxMethod" class="form-label">روش محاسبه مالیات</label>
+                                    <select class="form-select" id="taxMethod" name="tax_method">
+                                        <option value="exclusive" <?php echo $defaultValues['tax_method'] === 'exclusive' ? 'selected' : ''; ?>>
+                                            مالیات مجزا
+                                        </option>
+                                        <option value="inclusive" <?php echo $defaultValues['tax_method'] === 'inclusive' ? 'selected' : ''; ?>>
+                                            مالیات شامل
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="minStock" class="form-label">حداقل موجودی</label>
+                                    <input type="number" class="form-control" id="minStock" name="min_stock" 
+                                           value="<?php echo $defaultValues['min_stock']; ?>">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="maxStock" class="form-label">حداکثر موجودی</label>
+                                    <input type="number" class="form-control" id="maxStock" name="max_stock"
+                                           value="<?php echo $defaultValues['max_stock']; ?>">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="productStatus" class="form-label">وضعیت</label>
+                                    <select class="form-select" id="productStatus" name="status">
+                                        <option value="active" <?php echo $defaultValues['status'] === 'active' ? 'selected' : ''; ?>>فعال</option>
+                                        <option value="inactive" <?php echo $defaultValues['status'] === 'inactive' ? 'selected' : ''; ?>>غیرفعال</option>
+                                        <option value="discontinued" <?php echo $defaultValues['status'] === 'discontinued' ? 'selected' : ''; ?>>توقف تولید</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تنوع محصول -->
+                    <div class="form-section">
+                        <div class="section-header d-flex justify-content-between align-items-center">
+                            <h3><i class="fas fa-tasks"></i> تنوع محصول</h3>
+                            <button type="button" class="btn btn-primary" id="addVariation">
+                                <i class="fas fa-plus"></i> افزودن تنوع
+                            </button>
+                        </div>
+                        <div id="variationsContainer">
+                            <!-- تنوع‌ها اینجا اضافه می‌شوند -->
+                        </div>
+                    </div>
+
+                    <!-- تصاویر محصول -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-images"></i> تصاویر محصول</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="productImage" class="form-label">تصویر اصلی</label>
+                                    <input type="file" class="form-control" id="productImage" name="image" accept="image/*">
+                                    <div id="imagePreviewContainer" class="image-preview" style="display: none;">
+                                        <img id="imagePreview" src="#" alt="پیش‌نمایش تصویر">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">گالری تصاویر</label>
+                                    <div id="galleryUpload" class="dropzone">
+                                        <div class="dz-message">
+                                            تصاویر را اینجا رها کنید یا کلیک کنید
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
-    <!-- در انتهای فایل -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fa.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
-    <script src="https://unpkg.com/dropzone@5.9.3/dist/min/dropzone.min.js"></script>
-    <script src="<?php echo url('assets/js/main.js'); ?>"></script>
-    <script src="<?php echo url('assets/js/products.js'); ?>"></script>
-</body>
-</html>
+                    <!-- مشخصات فیزیکی -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-ruler-combined"></i> مشخصات فیزیکی</h3>

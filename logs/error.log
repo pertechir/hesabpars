@@ -10,3 +10,310 @@
 [01-May-2025 03:29:17 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
 [01-May-2025 03:29:32 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:40) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
 [01-May-2025 03:31:27 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 57
+[01-May-2025 03:40:30 Asia/Tehran] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\hesabpars\includes\init.php:63) in C:\xampp\htdocs\hesabpars\includes\config.php on line 49
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] include_once(../../includes/sidebar.php): Failed to open stream: No such file or directory on line 88 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  include_once(../../includes/sidebar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 88
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] include_once(): Failed opening '../../includes/sidebar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 88 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../../includes/sidebar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 88
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] include_once(../../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  include_once(../../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] include_once(): Failed opening '../../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:41:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:41:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] include_once(../../includes/sidebar.php): Failed to open stream: No such file or directory on line 88 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  include_once(../../includes/sidebar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 88
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] include_once(): Failed opening '../../includes/sidebar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 88 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../../includes/sidebar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 88
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] include_once(../../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  include_once(../../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] include_once(): Failed opening '../../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:01 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:01 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:21 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:21 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:48 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:48 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:50 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:50 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:44:55 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:44:55 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:46:06 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:06 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 93 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 93
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $units on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 188 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 188
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 249 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 249
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 250 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 250
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 268 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 268
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 274 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 274
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 323 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 323
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 324 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 324
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Undefined variable $defaultValues on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Undefined variable $defaultValues in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 03:46:10 Asia/Tehran] Error [2] Trying to access array offset on value of type null on line 325 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 03:46:10 Asia/Tehran] PHP Warning:  Trying to access array offset on value of type null in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 325
+[01-May-2025 04:02:09 Asia/Tehran] Error [2] include_once(../includes/navbar.php): Failed to open stream: No such file or directory on line 122 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 04:02:09 Asia/Tehran] PHP Warning:  include_once(../includes/navbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 122
+[01-May-2025 04:02:09 Asia/Tehran] Error [2] include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') on line 122 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 04:02:09 Asia/Tehran] PHP Warning:  include_once(): Failed opening '../includes/navbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 122
+[01-May-2025 04:02:09 Asia/Tehran] Error [2] Undefined variable $units on line 217 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 04:02:09 Asia/Tehran] PHP Warning:  Undefined variable $units in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 217
+[01-May-2025 04:02:09 Asia/Tehran] Error [2] foreach() argument must be of type array|object, null given on line 217 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 04:02:09 Asia/Tehran] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 217
+[01-May-2025 04:06:03 Asia/Tehran] Error [2] Undefined array key "max_stock" on line 430 in file C:\xampp\htdocs\hesabpars\pages\add-product.php
+[01-May-2025 04:06:03 Asia/Tehran] PHP Warning:  Undefined array key "max_stock" in C:\xampp\htdocs\hesabpars\pages\add-product.php on line 430

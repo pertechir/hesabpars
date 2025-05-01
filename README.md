@@ -1,13 +1,12 @@
 # hesabpars
 
 کد ناقص اومد. ادامشو بنویس. تا اینجا نوشتی.
-::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
 
-/* Validation Styles */
-.was-validated .form-control:invalid,
-.form-control.is
+<!-- مشخصات فیزیکی -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-ruler-combined"></i> مشخصات فیزیکی</h3>
+
 از همینجا به بعدشو بنویس. از اول ننویسی
 
 

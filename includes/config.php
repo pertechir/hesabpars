@@ -50,4 +50,3 @@ try {
     die("خطا در اتصال به دیتابیس");
 }
 
-// Remove function declarations from here since they're now in init.php
